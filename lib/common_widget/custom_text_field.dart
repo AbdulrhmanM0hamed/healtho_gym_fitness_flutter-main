@@ -52,6 +52,8 @@ class CustomTextField extends StatelessWidget {
         style: TextStyle(
           color: TColor.primaryText,
           fontSize: 14,
+  
+          letterSpacing: 0.5,
         ),
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
@@ -59,16 +61,33 @@ class CustomTextField extends StatelessWidget {
           hintStyle: TextStyle(
             color: TColor.secondaryText,
             fontSize: 14,
+        
+            letterSpacing: 0.5,
           ),
           prefixIcon: prefixIcon != null 
               ? Icon(prefixIcon, color: TColor.secondaryText, size: 20)
               : null,
           suffix: suffix,
-          border: InputBorder.none,
-          focusedBorder: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          errorBorder: InputBorder.none,
-          disabledBorder: InputBorder.none,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: BorderSide.none,
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: BorderSide.none,
+          ),
+          disabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: BorderSide.none,
+          ),
         ),
       ),
     );
