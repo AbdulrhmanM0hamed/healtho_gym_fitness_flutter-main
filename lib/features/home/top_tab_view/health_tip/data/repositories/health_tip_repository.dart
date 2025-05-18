@@ -7,8 +7,12 @@ class HealthTipRepository {
 
   HealthTipRepository(this._healthTipService);
 
-  Future<List<HealthTipModel>> getHealthTips() async {
-    return await _healthTipService.getHealthTips();
+  Future<List<HealthTipModel>> getHealthTips({int limit = 10, int offset = 0}) async {
+    return await _healthTipService.getHealthTips(limit: limit, offset: offset);
+  }
+  
+  Future<int> getHealthTipsCount() async {
+    return await _healthTipService.getHealthTipsCount();
   }
 
   Future<HealthTipModel?> getHealthTipById(String id) async {

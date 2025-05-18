@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:healtho_gym/common/color_extension.dart';
 import 'package:healtho_gym/core/di/service_locator.dart';
 import 'package:healtho_gym/features/home/top_tab_view/health_tip/presentation/viewmodels/health_tip_cubit.dart';
@@ -30,7 +31,7 @@ class _HealthTipDetailScreenState extends State<HealthTipDetailScreen> {
           backgroundColor: TColor.secondary,
           centerTitle: false,
           title: const Text(
-            "Health Tip",
+            "نصيحة صحية",
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -87,14 +88,20 @@ class _HealthTipDetailScreenState extends State<HealthTipDetailScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(8),
                           child: tip.imageUrl != null && tip.imageUrl!.isNotEmpty
-                              ? Image.network(
-                                  tip.imageUrl!,
+                              ? CachedNetworkImage(
+                                  imageUrl: tip.imageUrl!,
                                   width: double.maxFinite,
                                   height: MediaQuery.of(context).size.width * 0.5,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
+                                  fit: BoxFit.fill,
+                                  placeholder: (context, url) => Container(
+                                    color: Colors.grey.shade200,
+                                    child: const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  ),
+                                  errorWidget: (context, error, stackTrace) {
                                     return Image.asset(
                                       "assets/img/home_1.png",
                                       width: double.maxFinite,

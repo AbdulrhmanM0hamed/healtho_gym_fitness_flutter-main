@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:healtho_gym/common/color_extension.dart';
 import 'package:healtho_gym/features/home/top_tab_view/exercises/exercises_row.dart';
-import 'package:healtho_gym/features/home/top_tab_view/health_tip/health_tip_row.dart';
 import 'package:healtho_gym/features/home/top_tab_view/workout_plan/workout_exercises_screen.dart';
 
 class ExercisesNameScreen extends StatefulWidget {

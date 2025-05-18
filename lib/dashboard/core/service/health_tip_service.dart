@@ -10,17 +10,34 @@ class HealthTipService {
   final String _tableName = 'health_tips';
   final String _bucketName = 'healthtip';
 
-  Future<List<HealthTipModel>> getHealthTips() async {
+  Future<List<HealthTipModel>> getHealthTips({int limit = 10, int offset = 0}) async {
     try {
       final data = await _client
           .from(_tableName)
           .select()
-          .order('created_at', ascending: false);
+          .order('created_at', ascending: false)
+          .range(offset, offset + limit - 1); // Pagination support
       
       return (data as List<dynamic>).map((json) => HealthTipModel.fromJson(json)).toList();
     } catch (e) {
       LoggerUtil.error('Exception getting health tips: $e');
       throw Exception('Failed to get health tips: $e');
+    }
+  }
+  
+  // Get the total count of health tips for pagination
+  Future<int> getHealthTipsCount() async {
+    try {
+      // Get all records but only select the count (more efficient)
+      final data = await _client
+          .from(_tableName)
+          .select();
+      
+      // Return the length of the results
+      return data.length;
+    } catch (e) {
+      LoggerUtil.error('Exception getting health tips count: $e');
+      throw Exception('Failed to get health tips count: $e');
     }
   }
 

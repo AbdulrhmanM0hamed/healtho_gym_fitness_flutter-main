@@ -2,7 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:healtho_gym/core/di/service_locator.dart';
 import 'package:healtho_gym/core/utils/error_util.dart';
 import 'package:healtho_gym/core/utils/logger_util.dart';
-import 'package:healtho_gym/dashboard/features/user/data/models/user_with_profile.dart';
 import 'package:healtho_gym/dashboard/features/user/data/repositories/user_management_repository.dart';
 import 'package:healtho_gym/dashboard/features/user/presentation/viewmodels/user_management_state.dart';
 
