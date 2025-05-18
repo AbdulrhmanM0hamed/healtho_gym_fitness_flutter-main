@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:healtho_gym/common/color_extension.dart';
 import 'package:shimmer/shimmer.dart';
 
 class HealthTipShimmer extends StatelessWidget {
@@ -27,7 +26,7 @@ class HealthTipShimmer extends StatelessWidget {
                   Container(
                     width: 44,
                     height: 44,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
                     ),
@@ -111,9 +110,9 @@ class HealthTipShimmer extends StatelessWidget {
             Container(
               width: double.infinity,
               height: 180,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
-                borderRadius: const BorderRadius.only(
+                borderRadius:  BorderRadius.only(
                   bottomLeft: Radius.circular(15),
                   bottomRight: Radius.circular(15),
                 ),
@@ -128,7 +127,7 @@ class HealthTipShimmer extends StatelessWidget {
                   Container(
                     width: 16,
                     height: 16,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
                     ),

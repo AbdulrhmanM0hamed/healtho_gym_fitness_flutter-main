@@ -133,12 +133,22 @@ class _HealthTipRowUpdatedState extends State<HealthTipRowUpdated> {
                                 fontSize: 15,
                               ),
                             ),
-                            Text(
-                              _formatDate(widget.healthTip.createdAt),
-                              style: TextStyle(
-                                color: TColor.secondaryText,
-                                fontSize: 12,
-                              ),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.access_time_rounded,
+                                  size: 12,
+                                  color: TColor.secondaryText,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  _formatDate(widget.healthTip.createdAt),
+                                  style: TextStyle(
+                                    color: TColor.secondaryText,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -284,22 +294,35 @@ class _HealthTipRowUpdatedState extends State<HealthTipRowUpdated> {
 
   // Helper method to format date
   String _formatDate(DateTime date) {
-    // Get difference from now
+    // تحديد الفرق بين الوقت الحالي والتاريخ المحدد
     final difference = DateTime.now().difference(date);
     
-    if (difference.inDays > 365) {
-      return '${(difference.inDays / 365).floor()} سنة';
-    } else if (difference.inDays > 30) {
-      return '${(difference.inDays / 30).floor()} شهر';
+    // عرض التاريخ والوقت بطريقة مختلفة حسب الفترة المنقضية
+    if (difference.inDays > 7) {
+      // أكثر من أسبوع، نعرض التاريخ كاملاً
+      return '${date.day}/${date.month}/${date.year}, ${_formatTimeOfDay(date)}';
     } else if (difference.inDays > 0) {
-      return '${difference.inDays} يوم';
+      // من يوم إلى أسبوع نعرض عدد الأيام
+      return '${difference.inDays} ${difference.inDays == 1 ? 'يوم' : 'أيام'} مضت، ${_formatTimeOfDay(date)}';
     } else if (difference.inHours > 0) {
-      return '${difference.inHours} ساعة';
+      // من ساعة الى 24 ساعة، نعرض عدد الساعات
+      return '${difference.inHours} ${difference.inHours == 1 ? 'ساعة' : 'ساعات'} مضت';
     } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes} دقيقة';
+      // أقل من ساعة، نعرض عدد الدقائق
+      return '${difference.inMinutes} ${difference.inMinutes == 1 ? 'دقيقة' : 'دقائق'} مضت';
     } else {
+      // أقل من دقيقة
       return 'الآن';
     }
+  }
+  
+  // Helper method to format time
+  String _formatTimeOfDay(DateTime date) {
+    final hour = date.hour;
+    final minute = date.minute;
+    final period = hour >= 12 ? 'م' : 'ص';
+    final formattedHour = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
+    return '$formattedHour:${minute.toString().padLeft(2, '0')} $period';
   }
   
   // Show full post in modal dialog
@@ -385,12 +408,39 @@ class _HealthTipRowUpdatedState extends State<HealthTipRowUpdated> {
                                         fontSize: 16,
                                       ),
                                     ),
-                                    Text(
-                                      _formatDate(widget.healthTip.createdAt),
-                                      style: TextStyle(
-                                        color: TColor.secondaryText,
-                                        fontSize: 13,
-                                      ),
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.access_time_rounded,
+                                          size: 14,
+                                          color: TColor.secondaryText,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          _formatDate(widget.healthTip.createdAt),
+                                          style: TextStyle(
+                                            color: TColor.secondaryText,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.calendar_today,
+                                          size: 12,
+                                          color: TColor.secondaryText.withOpacity(0.7),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          _formatDateFull(widget.healthTip.createdAt),
+                                          style: TextStyle(
+                                            color: TColor.secondaryText.withOpacity(0.7),
+                                            fontSize: 11,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
@@ -626,5 +676,18 @@ class _HealthTipRowUpdatedState extends State<HealthTipRowUpdated> {
         ],
       ),
     );
+  }
+
+  // عرض كامل للتاريخ والوقت لصفحة التفاصيل
+  String _formatDateFull(DateTime date) {
+    // أسماء الأيام بالعربية
+    const List<String> weekDays = ['الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت', 'الأحد'];
+    // أسماء الشهور بالعربية
+    const List<String> months = ['يناير', 'فبراير', 'مارس', 'إبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+    
+    // تحويل weekday (1-7) إلى index (0-6) مع مراعاة أن الأحد هو 7 في DateTime ولكننا وضعناه في آخر المصفوفة
+    final dayIndex = date.weekday - 1;
+    
+    return '${weekDays[dayIndex]} ${date.day} ${months[date.month - 1]} ${date.year}، ${_formatTimeOfDay(date)}';
   }
 } 
