@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 import 'package:healtho_gym/core/di/service_locator.dart';
 import 'package:healtho_gym/models/user_profile_model.dart';
-import 'package:healtho_gym/services/user_profile_service.dart';
-import 'package:healtho_gym/utils/logger_util.dart';
+import 'package:healtho_gym/core/services/user_profile_service.dart';
+import 'package:healtho_gym/core/utils/logger_util.dart';
 import 'package:uuid/uuid.dart';
 
 class UserProfileRepository {

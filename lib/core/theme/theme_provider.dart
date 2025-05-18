@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:healtho_gym/core/preferences/app_preferences.dart';
 import 'package:healtho_gym/core/theme/app_theme.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ThemeProvider extends ChangeNotifier {
+  final _preferences = AppPreferences();
   ThemeMode _themeMode = ThemeMode.light;
   bool _initialized = false;
   
@@ -12,8 +13,7 @@ class ThemeProvider extends ChangeNotifier {
   Future<void> initialize() async {
     if (_initialized) return;
     
-    final prefs = await SharedPreferences.getInstance();
-    final isDark = prefs.getBool('is_dark_mode') ?? false;
+    final isDark = _preferences.isDarkMode;
     
     _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
     _initialized = true;
@@ -23,8 +23,7 @@ class ThemeProvider extends ChangeNotifier {
   Future<void> toggleTheme() async {
     _themeMode = _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
     
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('is_dark_mode', _themeMode == ThemeMode.dark);
+    await _preferences.setIsDarkMode(_themeMode == ThemeMode.dark);
     
     notifyListeners();
   }
@@ -35,8 +34,7 @@ class ThemeProvider extends ChangeNotifier {
     
     _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
     
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('is_dark_mode', isDark);
+    await _preferences.setIsDarkMode(isDark);
     
     notifyListeners();
   }

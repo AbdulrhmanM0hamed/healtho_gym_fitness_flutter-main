@@ -6,8 +6,8 @@ import 'package:healtho_gym/common_widget/toast_helper.dart';
 import 'package:healtho_gym/core/locale/app_localizations.dart';
 import 'package:healtho_gym/screen/home/top_tab_view/top_tab_view_screen.dart';
 import 'package:healtho_gym/screen/login/sign_up_screen.dart';
-import 'package:healtho_gym/utils/validation_util.dart';
-import 'package:healtho_gym/viewmodels/auth_view_model.dart';
+import 'package:healtho_gym/core/utils/validation_util.dart';
+import 'package:healtho_gym/screen/login/viewmodels/auth_view_model.dart';
 import 'package:provider/provider.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -68,11 +68,14 @@ class _SignInScreenState extends State<SignInScreen> {
           duration: const Duration(seconds: 2),
         );
         
-        // Navigate to home screen
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const TopTabViewScreen()),
-        );
+        // Navigate to home screen after showing the toast
+        await Future.delayed(const Duration(milliseconds: 1000));
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const TopTabViewScreen()),
+          );
+        }
       }
     }
   }
@@ -132,9 +135,7 @@ class _SignInScreenState extends State<SignInScreen> {
     }
     
     return Directionality(
-      textDirection: locale.locale.languageCode == 'ar' 
-          ? TextDirection.rtl 
-          : TextDirection.ltr,
+      textDirection: TextDirection.rtl, // Always use RTL for Arabic
       child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: SafeArea(

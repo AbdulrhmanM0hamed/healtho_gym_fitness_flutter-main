@@ -4,12 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:healtho_gym/common/color_extension.dart';
 import 'package:healtho_gym/core/locale/app_localizations.dart';
 import 'package:healtho_gym/core/locale/locale_provider.dart';
-import 'package:healtho_gym/screen/home/top_tab_view/top_tab_view_screen.dart';
-import 'package:healtho_gym/screen/login/onboarding_screen.dart';
-import 'package:healtho_gym/screen/login/sign_in_screen.dart';
-import 'package:healtho_gym/viewmodels/auth_view_model.dart';
+import 'package:healtho_gym/core/preferences/app_preferences.dart';
+import 'package:healtho_gym/core/routes/app_routes.dart';
+import 'package:healtho_gym/screen/login/viewmodels/auth_view_model.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -19,6 +17,8 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  final _preferences = AppPreferences();
+
   @override
   void initState() {
     super.initState();
@@ -26,9 +26,6 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _navigateToNextScreen() async {
-    final prefs = await SharedPreferences.getInstance();
-    final hasSeenOnboarding = prefs.getBool('has_seen_onboarding') ?? false;
-    
     // Simulate a loading duration
     await Future.delayed(const Duration(seconds: 2));
     
@@ -38,22 +35,13 @@ class _SplashScreenState extends State<SplashScreen> {
       
       if (authViewModel.isLoggedIn) {
         // Navigate to home screen if logged in
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const TopTabViewScreen()),
-        );
+        AppRoutes.navigateAndClearStack(context, AppRoutes.home);
       } else {
         // Navigate to onboarding or sign in screen
-        if (!hasSeenOnboarding) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const OnboardingScreen()),
-          );
+        if (!_preferences.hasSeenOnboarding) {
+          AppRoutes.navigateAndClearStack(context, AppRoutes.onboarding);
         } else {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const SignInScreen()),
-          );
+          AppRoutes.navigateAndClearStack(context, AppRoutes.signIn);
         }
       }
     }
@@ -65,7 +53,7 @@ class _SplashScreenState extends State<SplashScreen> {
     final localeProvider = Provider.of<LocaleProvider>(context);
     
     return Directionality(
-      textDirection: localeProvider.isArabic ? TextDirection.rtl : TextDirection.ltr,
+      textDirection: TextDirection.rtl, // Always RTL for Arabic
       child: Scaffold(
         body: Center(
           child: Column(
@@ -92,11 +80,8 @@ class _SplashScreenState extends State<SplashScreen> {
                 style: Theme.of(context).textTheme.titleLarge,
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 50),
-              // Loading indicator
-              CircularProgressIndicator(
-                color: TColor.primary,
-              ),
+           
+            
             ],
           ),
         ),

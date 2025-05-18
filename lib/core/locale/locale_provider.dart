@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:healtho_gym/core/preferences/app_preferences.dart';
 
 class LocaleProvider extends ChangeNotifier {
+  final _preferences = AppPreferences();
   Locale _locale = const Locale('ar');
   bool _initialized = false;
   
@@ -13,8 +14,7 @@ class LocaleProvider extends ChangeNotifier {
   Future<void> initialize() async {
     if (_initialized) return;
     
-    final prefs = await SharedPreferences.getInstance();
-    final languageCode = prefs.getString('language_code') ?? 'ar';
+    final languageCode = _preferences.languageCode;
     
     _locale = Locale(languageCode);
     _initialized = true;
@@ -26,8 +26,7 @@ class LocaleProvider extends ChangeNotifier {
     
     _locale = locale;
     
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('language_code', locale.languageCode);
+    await _preferences.setLanguageCode(locale.languageCode);
     
     notifyListeners();
   }

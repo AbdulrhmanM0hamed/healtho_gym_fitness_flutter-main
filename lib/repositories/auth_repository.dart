@@ -1,7 +1,7 @@
 import 'package:healtho_gym/core/di/service_locator.dart';
 import 'package:healtho_gym/models/user_model.dart';
-import 'package:healtho_gym/services/auth_service.dart';
-import 'package:healtho_gym/utils/logger_util.dart';
+import 'package:healtho_gym/core/services/auth_service.dart';
+import 'package:healtho_gym/core/utils/logger_util.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthRepository {

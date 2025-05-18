@@ -3,7 +3,7 @@ import 'package:healtho_gym/common_widget/round_button.dart';
 import 'package:healtho_gym/common_widget/toast_helper.dart';
 import 'package:healtho_gym/core/locale/app_localizations.dart';
 import 'package:healtho_gym/screen/login/sign_in_screen.dart';
-import 'package:healtho_gym/viewmodels/auth_view_model.dart';
+import 'package:healtho_gym/screen/login/viewmodels/auth_view_model.dart';
 import 'package:provider/provider.dart';
 
 class ProfileTabScreen extends StatefulWidget {
@@ -27,12 +27,15 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
       await _authViewModel.signOut();
       
       if (mounted) {
+        final locale = AppLocalizations.of(context);
         ToastHelper.showSuccess(
           context: context,
-          message: AppLocalizations.of(context).signOut,
+          title: locale.success,
+          message: locale.signOut,
         );
         
-        await Future.delayed(const Duration(milliseconds: 800));
+        // Give toast time to be visible
+        await Future.delayed(const Duration(milliseconds: 1500));
         if (mounted) {
           Navigator.pushReplacement(
             context,

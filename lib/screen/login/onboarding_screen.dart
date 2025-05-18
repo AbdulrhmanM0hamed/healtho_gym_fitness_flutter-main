@@ -3,9 +3,9 @@ import 'package:healtho_gym/common/color_extension.dart';
 import 'package:healtho_gym/common_widget/round_button.dart';
 import 'package:healtho_gym/core/locale/app_localizations.dart';
 import 'package:healtho_gym/core/locale/locale_provider.dart';
-import 'package:healtho_gym/screen/login/sign_in_screen.dart';
+import 'package:healtho_gym/core/preferences/app_preferences.dart';
+import 'package:healtho_gym/core/routes/app_routes.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -16,13 +16,26 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
+  final _preferences = AppPreferences();
   int _currentPage = 0;
   
   final List<String> _images = [
-    "assets/img/onboarding_1.png",
-    "assets/img/onboarding_2.png",
-    "assets/img/onboarding_3.png",
+    "assets/img/in_1.png",
+    "assets/img/in_2.png",
+    "assets/img/in_3.png",
   ];
+  
+  @override
+  void initState() {
+    super.initState();
+    // Ensure locale is set to Arabic by default
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
+      if (localeProvider.languageCode != 'ar') {
+        localeProvider.setArabic();
+      }
+    });
+  }
   
   @override
   void dispose() {
@@ -31,25 +44,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
   
   void _completeOnboarding() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('has_seen_onboarding', true);
+    // Mark onboarding as seen
+    await _preferences.setHasSeenOnboarding(true);
     
     if (mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const SignInScreen()),
-      );
+      // Navigate to sign in screen
+      AppRoutes.navigateAndClearStack(context, AppRoutes.signIn);
     }
   }
   
   @override
   Widget build(BuildContext context) {
     final locale = AppLocalizations.of(context);
-    final localeProvider = Provider.of<LocaleProvider>(context);
     final isLastPage = _currentPage == 2;
     
     return Directionality(
-      textDirection: localeProvider.isArabic ? TextDirection.rtl : TextDirection.ltr,
+      textDirection: TextDirection.rtl,  // Always use RTL for Arabic
       child: Scaffold(
         body: SafeArea(
           child: Column(

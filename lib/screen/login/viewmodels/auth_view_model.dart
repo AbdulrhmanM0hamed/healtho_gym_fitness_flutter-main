@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:healtho_gym/core/di/service_locator.dart';
 import 'package:healtho_gym/models/user_model.dart';
 import 'package:healtho_gym/repositories/auth_repository.dart';
-import 'package:healtho_gym/utils/error_util.dart';
-import 'package:healtho_gym/utils/logger_util.dart';
+import 'package:healtho_gym/core/utils/error_util.dart';
+import 'package:healtho_gym/core/utils/logger_util.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 enum AuthStatus {

@@ -1,12 +1,12 @@
 class ValidationUtil {
   static String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your email';
+      return 'الرجاء إدخال البريد الإلكتروني';
     }
     
     final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegExp.hasMatch(value)) {
-      return 'Please enter a valid email address';
+      return 'الرجاء إدخال عنوان بريد إلكتروني صالح';
     }
     
     return null;
@@ -14,11 +14,11 @@ class ValidationUtil {
   
   static String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your password';
+      return 'الرجاء إدخال كلمة المرور';
     }
     
     if (value.length < 6) {
-      return 'Password must be at least 6 characters';
+      return 'يجب أن تتكون كلمة المرور من 6 أحرف على الأقل';
     }
     
     return null;
@@ -26,11 +26,11 @@ class ValidationUtil {
   
   static String? validateConfirmPassword(String? value, String password) {
     if (value == null || value.isEmpty) {
-      return 'Please confirm your password';
+      return 'الرجاء تأكيد كلمة المرور';
     }
     
     if (value != password) {
-      return 'Passwords do not match';
+      return 'كلمات المرور غير متطابقة';
     }
     
     return null;
@@ -38,7 +38,7 @@ class ValidationUtil {
   
   static String? validateName(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your name';
+      return 'الرجاء إدخال الاسم';
     }
     
     return null;
@@ -46,16 +46,16 @@ class ValidationUtil {
   
   static String? validateAge(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your age';
+      return 'الرجاء إدخال العمر';
     }
     
     final age = int.tryParse(value);
     if (age == null) {
-      return 'Please enter a valid number';
+      return 'الرجاء إدخال رقم صحيح';
     }
     
     if (age < 12 || age > 100) {
-      return 'Age must be between 12 and 100';
+      return 'يجب أن يكون العمر بين 12 و 100';
     }
     
     return null;
@@ -63,17 +63,17 @@ class ValidationUtil {
   
   static String? validateHeight(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your height';
+      return 'الرجاء إدخال الطول';
     }
     
     final height = double.tryParse(value);
     if (height == null) {
-      return 'Please enter a valid number';
+      return 'الرجاء إدخال رقم صحيح';
     }
     
     // Height in cm
     if (height < 100 || height > 250) {
-      return 'Height must be between 100cm and 250cm';
+      return 'يجب أن يكون الطول بين 100 و 250 سم';
     }
     
     return null;
@@ -81,17 +81,17 @@ class ValidationUtil {
   
   static String? validateWeight(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your weight';
+      return 'الرجاء إدخال الوزن';
     }
     
     final weight = double.tryParse(value);
     if (weight == null) {
-      return 'Please enter a valid number';
+      return 'الرجاء إدخال رقم صحيح';
     }
     
     // Weight in kg
     if (weight < 30 || weight > 300) {
-      return 'Weight must be between 30kg and 300kg';
+      return 'يجب أن يكون الوزن بين 30 و 300 كجم';
     }
     
     return null;

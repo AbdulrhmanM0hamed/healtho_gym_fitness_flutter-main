@@ -1,6 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:healtho_gym/services/supabase_service.dart';
-import 'package:healtho_gym/utils/logger_util.dart';
+import 'package:healtho_gym/core/services/supabase_service.dart';
+import 'package:healtho_gym/core/utils/logger_util.dart';
 
 class AuthService {
   final SupabaseClient _supabase = SupabaseService.supabase;
