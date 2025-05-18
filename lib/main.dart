@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:healtho_gym/core/di/service_locator.dart';
 import 'package:healtho_gym/core/locale/app_localizations.dart';
@@ -7,10 +8,22 @@ import 'package:healtho_gym/core/preferences/app_preferences.dart';
 import 'package:healtho_gym/core/routes/app_routes.dart';
 import 'package:healtho_gym/core/theme/app_theme.dart';
 import 'package:healtho_gym/core/theme/theme_provider.dart';
+import 'package:healtho_gym/dashboard/app/dashboard_app.dart';
 import 'package:healtho_gym/features/splash/splash_screen.dart';
 import 'package:provider/provider.dart';
 
+// To use the dashboard, comment out this line and uncomment the next line
+// void main() async {
+//   mainMobile();
+// }
+
+// To use the dashboard, uncomment this line and comment out the previous main
 void main() async {
+  mainMobile();
+}
+
+// Mobile application entry point
+void mainMobile() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   // Initialize Preferences
@@ -28,6 +41,20 @@ void main() async {
       child: const MyApp(),
     ),
   );
+}
+
+// Dashboard application entry point
+void mainDashboard() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize ServiceLocator
+  await ServiceLocator.init();
+  
+  // This would be a better approach but requires importing the dashboard directly
+  // runApp(const DashboardApp());
+  
+  // Instead, for now, show a message telling the user to use dashboard_main.dart
+  runApp(DashboardApp());
 }
 
 class MyApp extends StatelessWidget {

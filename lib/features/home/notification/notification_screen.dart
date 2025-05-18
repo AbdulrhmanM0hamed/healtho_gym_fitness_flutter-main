@@ -26,8 +26,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
       appBar: AppBar(
         backgroundColor: TColor.secondary,
         centerTitle: false,
-        leading: Container(),
-        leadingWidth: 20,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+        leadingWidth: 56,
         title: const Text(
           "Notification",
           style: TextStyle(

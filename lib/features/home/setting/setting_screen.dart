@@ -19,7 +19,10 @@ class _SettingScreenState extends State<SettingScreen> {
       appBar: AppBar(
         backgroundColor: TColor.secondary,
         centerTitle: false,
-        leading: Container(),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: const Text(
           "Setting",
           style: TextStyle(
@@ -37,7 +40,10 @@ class _SettingScreenState extends State<SettingScreen> {
               icon: "assets/img/user_placeholder.png",
               isIconCircle: true,
               onPressed: () {
-                context.push( const ProfileScreen());
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                );
               }),
           SettingRow(
               title: "Language options",
@@ -54,7 +60,10 @@ class _SettingScreenState extends State<SettingScreen> {
               icon: "assets/img/notification.png",
               value: "On",
               onPressed: () {
-                context.push(const NotificationScreen());
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const NotificationScreen()),
+                );
               }),
           SettingRow(
               title: "Refer a Friend",
@@ -76,7 +85,10 @@ class _SettingScreenState extends State<SettingScreen> {
               icon: "assets/img/rating.png",
               value: "",
               onPressed: () {
-                context.push(const ReminderScreen());
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ReminderScreen()),
+                );
               }),
           SettingRow(
               title: "Log Out",

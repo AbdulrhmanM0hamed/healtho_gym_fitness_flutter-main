@@ -9,6 +9,7 @@ class UserProfileModel {
   final String? fitnessLevel;
   final String? profilePictureUrl;
   final DateTime? updateDate;
+  final bool isAdmin;
   
   UserProfileModel({
     required this.id,
@@ -21,6 +22,7 @@ class UserProfileModel {
     this.fitnessLevel,
     this.profilePictureUrl,
     this.updateDate,
+    this.isAdmin = false,
   });
   
   factory UserProfileModel.fromJson(Map<String, dynamic> json) {
@@ -35,6 +37,7 @@ class UserProfileModel {
       fitnessLevel: json['fitness_level'],
       profilePictureUrl: json['profile_picture_url'],
       updateDate: json['update_date'] != null ? DateTime.parse(json['update_date']) : null,
+      isAdmin: json['is_admin'] == true,
     );
   }
   
@@ -50,6 +53,7 @@ class UserProfileModel {
       'fitness_level': fitnessLevel,
       'profile_picture_url': profilePictureUrl,
       'update_date': updateDate?.toIso8601String(),
+      'is_admin': isAdmin,
     };
   }
   
@@ -64,6 +68,7 @@ class UserProfileModel {
     String? fitnessLevel,
     String? profilePictureUrl,
     DateTime? updateDate,
+    bool? isAdmin,
   }) {
     return UserProfileModel(
       id: id ?? this.id,
@@ -76,6 +81,7 @@ class UserProfileModel {
       fitnessLevel: fitnessLevel ?? this.fitnessLevel,
       profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
       updateDate: updateDate ?? this.updateDate,
+      isAdmin: isAdmin ?? this.isAdmin,
     );
   }
 } 

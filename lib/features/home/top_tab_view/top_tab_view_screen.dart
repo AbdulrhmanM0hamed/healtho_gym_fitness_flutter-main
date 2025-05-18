@@ -3,10 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:healtho_gym/common/color_extension.dart';
 import 'package:healtho_gym/common_widget/top_tab_button.dart';
 import 'package:healtho_gym/core/di/service_locator.dart';
+import 'package:healtho_gym/features/home/setting/setting_screen.dart';
 import 'package:healtho_gym/features/home/top_tab_view/challenges/challenges_tab_screen.dart';
 import 'package:healtho_gym/features/home/top_tab_view/dietician/dietician_tab_screen.dart';
 import 'package:healtho_gym/features/home/top_tab_view/exercises/exercises_tab_screen.dart';
-import 'package:healtho_gym/features/home/top_tab_view/health_tip/health_tip_screen.dart';
+import 'package:healtho_gym/features/home/top_tab_view/health_tip/presentation/views/health_tip_screen.dart';
 import 'package:healtho_gym/features/home/top_tab_view/profile/profile_tab_screen.dart';
 import 'package:healtho_gym/features/home/top_tab_view/trainer/trainer_tab_screen.dart';
 import 'package:healtho_gym/features/home/top_tab_view/workout_plan/workout_plan_screen.dart';
@@ -73,6 +74,17 @@ class _TopTabViewScreenState extends State<TopTabViewScreen>
               fontWeight: FontWeight.w600,
             ),
           ),
+          // actions: [
+          //   IconButton(
+          //     icon: const Icon(Icons.settings, color: Colors.white),
+          //     onPressed: () {
+          //       Navigator.push(
+          //         context,
+          //         MaterialPageRoute(builder: (context) => const SettingScreen()),
+          //       );
+          //     },
+          //   ),
+          // ],
         ),
         body: Column(
           children: [

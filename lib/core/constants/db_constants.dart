@@ -21,6 +21,7 @@ class DBConstants {
   static const String fitnessLevel = 'fitness_level';
   static const String profilePictureUrl = 'profile_picture_url';
   static const String updateDate = 'update_date';
+  static const String isAdmin = 'is_admin';
   
   // Workout plans table fields
   static const String planId = 'id';
