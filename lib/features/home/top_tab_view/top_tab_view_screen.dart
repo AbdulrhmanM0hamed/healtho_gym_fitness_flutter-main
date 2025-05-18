@@ -21,37 +21,38 @@ class TopTabViewScreen extends StatefulWidget {
   State<TopTabViewScreen> createState() => _TopTabViewScreenState();
 }
 
-class _TopTabViewScreenState extends State<TopTabViewScreen>
-    with SingleTickerProviderStateMixin {
+class _TopTabViewScreenState extends State<TopTabViewScreen> {
+  // Tab names
   var tapArr = [
     "نصائح صحية",
     "تمارين",
     "خطة تمرين",
     "تحديات",
     "مدربين",
-  //  "أخصائي التغذية",
     "الحساب"
   ];
 
+  // Tab icons paths
+  var tabIcons = [
+    "assets/img/tab_bar/health_tips.svg",
+    "assets/img/tab_bar/exercies.svg",
+    "assets/img/tab_bar/exercies_plan.svg",
+    "assets/img/tab_bar/challenge.svg",
+    "assets/img/tab_bar/trenie.svg", 
+    "assets/img/tab_bar/profile.svg",
+  ];
+
   int selectTab = 0;
-  TabController? controller;
 
-  @override
-  void initState() {
-    super.initState();
-    controller = TabController(length: 6, vsync: this);
-    controller?.addListener(() {
-      setState(() {
-        selectTab = controller?.index.round() ?? 0;
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    controller?.dispose();
-    super.dispose();
-  }
+  // Create all screens once
+  final List<Widget> _screens = const [
+    HealthTipScreen(),
+    ExercisesScreen(),
+    WorkoutPlanScreen(),
+    ChallengesScreen(),
+    TrainerTabScreen(),
+    ProfileTabScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -102,14 +103,15 @@ class _TopTabViewScreenState extends State<TopTabViewScreen>
                       var index = tapArr.indexOf(name);
 
                       return TopTabButton(
-                          title: name,
-                          isSelect: selectTab == index,
-                          onPressed: () {
-                            setState(() {
-                              selectTab = index;
-                              controller?.animateTo(index);
-                            });
+                        title: name,
+                        isSelect: selectTab == index,
+                        iconPath: tabIcons[index],
+                        onPressed: () {
+                          setState(() {
+                            selectTab = index;
                           });
+                        },
+                      );
                     }).toList(),
                   ),
                 ),
@@ -117,19 +119,11 @@ class _TopTabViewScreenState extends State<TopTabViewScreen>
             ),
 
             //TODO: Tab View
-
+            // Use IndexedStack to preserve state
             Expanded(
-              child: TabBarView(
-                controller: controller,
-                children: const [
-                  HealthTipScreen(),
-                  ExercisesScreen(),
-                  WorkoutPlanScreen(),
-                  ChallengesScreen(),
-                  TrainerTabScreen(),
-            //      DieticianTabScreen(),
-                  ProfileTabScreen(),
-                ],
+              child: IndexedStack(
+                index: selectTab,
+                children: _screens,
               ),
             )
           ],

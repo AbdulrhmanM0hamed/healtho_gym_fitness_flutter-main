@@ -26,9 +26,9 @@ class DashboardApp extends StatelessWidget {
           useMaterial3: true,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        initialRoute: DashboardRoutes.login,
+        initialRoute: DashboardRoutes.home,
         routes: {
-          DashboardRoutes.login: (context) => const DashboardLoginScreen(),
+   //       DashboardRoutes.login: (context) => const DashboardLoginScreen(),
           DashboardRoutes.home: (context) => const DashboardHomeScreen(),
         },
       ),

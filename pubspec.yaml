@@ -37,6 +37,7 @@ dependencies:
     sdk: flutter
   flutter_rating_bar: ^4.0.1
   flutter_secure_storage: ^9.0.0
+  flutter_svg: ^2.1.0
   fluttertoast: ^8.2.4
   form_validator: ^2.1.1
   get_it: ^8.0.3
@@ -69,6 +70,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/img/
+    - assets/img/tab_bar/
   #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

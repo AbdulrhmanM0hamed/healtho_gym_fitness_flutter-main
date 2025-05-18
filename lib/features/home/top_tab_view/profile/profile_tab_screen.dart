@@ -31,7 +31,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
   Future<void> _handleSignOut() async {
     try {
       final success = await context.read<AuthCubit>().signOut();
-      
+
       if (success && mounted) {
         final locale = AppLocalizations.of(context);
         ToastHelper.showSuccess(
@@ -39,7 +39,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
           title: locale.success,
           message: locale.signOut,
         );
-        
+
         // Give toast time to be visible
         await Future.delayed(const Duration(milliseconds: 1500));
         if (mounted) {
@@ -68,21 +68,21 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
   Widget build(BuildContext context) {
     final locale = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    
+
     return BlocBuilder<AuthCubit, AuthState>(
       builder: (context, authState) {
         final user = authState.user;
-        
+
         if (user == null) {
           return const Center(
             child: CircularProgressIndicator(),
           );
         }
-        
+
         return BlocBuilder<ProfileCubit, ProfileState>(
           builder: (context, profileState) {
             final userProfile = profileState.userProfile;
-            
+
             return SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -109,25 +109,25 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                             radius: 40,
                             backgroundColor: theme.colorScheme.primary,
                             child: userProfile?.profilePictureUrl != null
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(40),
-                                  child: Image.network(
-                                    userProfile!.profilePictureUrl!,
-                                    width: 80,
-                                    height: 80,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (ctx, err, _) => const Icon(
-                                      Icons.person,
-                                      size: 50,
-                                      color: Colors.white,
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(40),
+                                    child: Image.network(
+                                      userProfile!.profilePictureUrl!,
+                                      width: 80,
+                                      height: 80,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (ctx, err, _) => const Icon(
+                                        Icons.person,
+                                        size: 50,
+                                        color: Colors.white,
+                                      ),
                                     ),
+                                  )
+                                : const Icon(
+                                    Icons.person,
+                                    size: 50,
+                                    color: Colors.white,
                                   ),
-                                )
-                              : const Icon(
-                                  Icons.person,
-                                  size: 50,
-                                  color: Colors.white,
-                                ),
                           ),
                           const SizedBox(width: 20),
                           Expanded(
@@ -135,7 +135,9 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  userProfile?.fullName ?? user.email ?? locale.profile,
+                                  userProfile?.fullName ??
+                                      user.email ??
+                                      locale.profile,
                                   style: theme.textTheme.titleLarge?.copyWith(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -149,7 +151,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                                   ),
                                 ),
                                 if (userProfile?.isAdmin == true)
-                                  Padding(
+                                  const Padding(
                                     padding: const EdgeInsets.only(top: 6),
                                     child: Chip(
                                       backgroundColor: Colors.amber,
@@ -169,7 +171,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    
+
                     // Profile Options
                     Container(
                       decoration: BoxDecoration(
@@ -237,7 +239,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    
+
                     // Sign Out Button
                     RoundButton(
                       title: locale.signOut,
@@ -261,7 +263,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
   }) {
     final primaryColor = Theme.of(context).colorScheme.primary;
     final highlightColor = highlight ? Colors.amber : primaryColor;
-    
+
     return InkWell(
       onTap: onTap,
       child: Padding(
@@ -277,9 +279,9 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
             Text(
               title,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: highlight ? FontWeight.bold : null,
-                color: highlight ? Colors.black87 : null,
-              ),
+                    fontWeight: highlight ? FontWeight.bold : null,
+                    color: highlight ? Colors.black87 : null,
+                  ),
             ),
             const Spacer(),
             Icon(
@@ -291,4 +293,4 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
       ),
     );
   }
-} 
+}
