@@ -34,6 +34,26 @@ class _HealthTipRowUpdatedState extends State<HealthTipRowUpdated> {
     _checkIfLiked();
   }
 
+  // تحضير URL الصورة مع إضافة معرف الـ healthTip كمفتاح للتخزين المؤقت
+  String _getImageUrl() {
+    final cubit = context.read<HealthTipCubit>();
+    
+    // إذا كنا في وضع التحديث، نضيف طابع زمني للتجاوز التخزين المؤقت
+    if (widget.healthTip.imageUrl != null) {
+      return widget.healthTip.imageUrl!;
+    }
+    return 'assets/img/home_1.png';
+  }
+
+  // تحضير مفتاح التخزين المؤقت للصورة
+  String _getImageCacheKey() {
+    final cubit = context.read<HealthTipCubit>();
+    
+    // استخدام معرف النصيحة الصحية كمفتاح للتخزين المؤقت
+    // مع إضافة طابع زمني من الكيوبت إذا كنا في وضع التحديث
+    return 'health_tip_${widget.healthTip.id}_${cubit.refreshTimestamp}';
+  }
+
   // Check if the user has already liked this post
   Future<void> _checkIfLiked() async {
     try {
@@ -196,8 +216,9 @@ class _HealthTipRowUpdatedState extends State<HealthTipRowUpdated> {
                       bottomRight: Radius.circular(15),
                     ),
                     child: CachedNetworkImage(
-                      imageUrl: widget.healthTip.imageUrl! + '?t=${DateTime.now().millisecondsSinceEpoch}',
-                      key: ValueKey('${widget.healthTip.id}_${DateTime.now().millisecondsSinceEpoch}'),
+                      imageUrl: widget.healthTip.imageUrl!,
+                      cacheKey: _getImageCacheKey(),
+                      key: ValueKey(widget.healthTip.id),
                       width: double.infinity,
                       height: 180,
                       fit: BoxFit.cover,
@@ -467,8 +488,9 @@ class _HealthTipRowUpdatedState extends State<HealthTipRowUpdated> {
                         // Image in full size
                         if (widget.healthTip.imageUrl != null)
                           CachedNetworkImage(
-                            imageUrl: widget.healthTip.imageUrl! + '?t=${DateTime.now().millisecondsSinceEpoch}',
-                            key: ValueKey('${widget.healthTip.id}_${DateTime.now().millisecondsSinceEpoch}'),
+                            imageUrl: widget.healthTip.imageUrl!,
+                            cacheKey: _getImageCacheKey(),
+                            key: ValueKey(widget.healthTip.id),
                             width: double.infinity,
                             height: 250,
                             fit: BoxFit.contain,

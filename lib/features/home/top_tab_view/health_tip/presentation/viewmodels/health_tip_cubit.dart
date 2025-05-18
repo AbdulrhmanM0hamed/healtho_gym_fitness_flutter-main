@@ -103,10 +103,10 @@ class HealthTipCubit extends Cubit<HealthTipState> {
   // Refresh health tips and start from first page
   Future<void> refreshHealthTips() async {
     try {
-      // تحديث الطابع الزمني للتجديد
+      // تحديث الطابع الزمني للتجديد - هذا سيؤدي إلى تغيير مفاتيح التخزين المؤقت للصور
       refreshTimestamp = DateTime.now().millisecondsSinceEpoch.toString();
       
-      // محاولة مسح ذاكرة التخزين المؤقت للصور
+      // محاولة مسح ذاكرة التخزين المؤقت للصور - اختياري لأن مفاتيح التخزين المؤقت ستتغير على أي حال
       try {
         await DefaultCacheManager().emptyCache();
       } catch (e) {
