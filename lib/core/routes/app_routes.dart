@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:healtho_gym/screen/home/top_tab_view/top_tab_view_screen.dart';
-import 'package:healtho_gym/screen/login/onboarding_screen.dart';
-import 'package:healtho_gym/screen/login/sign_in_screen.dart';
-import 'package:healtho_gym/screen/login/sign_up_screen.dart';
-import 'package:healtho_gym/screen/login/splash_screen.dart';
+import 'package:healtho_gym/features/home/top_tab_view/top_tab_view_screen.dart';
+import 'package:healtho_gym/features/onboarding/onboarding_screen.dart';
+import 'package:healtho_gym/features/login/presentation/view/screens/sign_in_screen.dart';
+import 'package:healtho_gym/features/login/presentation/view/screens/sign_up_screen.dart';
+import 'package:healtho_gym/features/splash/splash_screen.dart';
 
 class AppRoutes {
   // Route names

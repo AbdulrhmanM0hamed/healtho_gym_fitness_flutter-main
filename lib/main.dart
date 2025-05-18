@@ -7,12 +7,7 @@ import 'package:healtho_gym/core/preferences/app_preferences.dart';
 import 'package:healtho_gym/core/routes/app_routes.dart';
 import 'package:healtho_gym/core/theme/app_theme.dart';
 import 'package:healtho_gym/core/theme/theme_provider.dart';
-import 'package:healtho_gym/screen/home/top_tab_view/top_tab_view_screen.dart';
-import 'package:healtho_gym/screen/login/onboarding_screen.dart';
-import 'package:healtho_gym/screen/login/sign_in_screen.dart';
-import 'package:healtho_gym/screen/login/splash_screen.dart';
-import 'package:healtho_gym/screen/login/viewmodels/auth_view_model.dart';
-import 'package:healtho_gym/screen/login/viewmodels/user_profile_view_model.dart';
+import 'package:healtho_gym/features/splash/splash_screen.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -27,8 +22,6 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => sl<AuthViewModel>()),
-        ChangeNotifierProvider(create: (_) => sl<UserProfileViewModel>()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()..initialize()),
         ChangeNotifierProvider(create: (_) => LocaleProvider()..initialize()),
       ],
