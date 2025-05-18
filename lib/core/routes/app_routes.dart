@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:healtho_gym/screen/home/top_tab_view/top_tab_view_screen.dart';
 import 'package:healtho_gym/screen/login/onboarding_screen.dart';
 import 'package:healtho_gym/screen/login/sign_in_screen.dart';
+import 'package:healtho_gym/screen/login/sign_up_screen.dart';
 import 'package:healtho_gym/screen/login/splash_screen.dart';
 
 class AppRoutes {
@@ -17,6 +18,7 @@ class AppRoutes {
     splash: (context) => const SplashScreen(),
     onboarding: (context) => const OnboardingScreen(),
     signIn: (context) => const SignInScreen(),
+    signUp: (context) => const SignUpScreen(),
     home: (context) => const TopTabViewScreen(),
   };
   
@@ -37,6 +39,8 @@ class AppRoutes {
             return const OnboardingScreen();
           case signIn:
             return const SignInScreen();
+          case signUp:
+            return const SignUpScreen();
           case home:
             return const TopTabViewScreen();
           default:

@@ -4,6 +4,7 @@ import 'package:healtho_gym/common_widget/custom_text_field.dart';
 import 'package:healtho_gym/common_widget/round_button.dart';
 import 'package:healtho_gym/common_widget/toast_helper.dart';
 import 'package:healtho_gym/core/locale/app_localizations.dart';
+import 'package:healtho_gym/core/routes/app_routes.dart';
 import 'package:healtho_gym/screen/home/top_tab_view/top_tab_view_screen.dart';
 import 'package:healtho_gym/screen/login/sign_up_screen.dart';
 import 'package:healtho_gym/core/utils/validation_util.dart';
@@ -69,12 +70,9 @@ class _SignInScreenState extends State<SignInScreen> {
         );
         
         // Navigate to home screen after showing the toast
-        await Future.delayed(const Duration(milliseconds: 1000));
+        await Future.delayed(const Duration(seconds: 2));
         if (mounted) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const TopTabViewScreen()),
-          );
+          AppRoutes.navigateAndClearStack(context, AppRoutes.home);
         }
       }
     }
@@ -127,10 +125,7 @@ class _SignInScreenState extends State<SignInScreen> {
     if (authViewModel.status == AuthStatus.authenticated) {
       // Navigate to home screen in the next frame
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const TopTabViewScreen()),
-        );
+        AppRoutes.navigateAndClearStack(context, AppRoutes.home);
       });
     }
     
@@ -361,10 +356,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                         TextButton(
                           onPressed: _isLoading ? null : () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const SignUpScreen()),
-                            );
+                            AppRoutes.navigateTo(context, AppRoutes.signUp);
                           },
                           style: TextButton.styleFrom(
                             minimumSize: Size.zero,

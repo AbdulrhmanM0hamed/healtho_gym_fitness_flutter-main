@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:healtho_gym/common_widget/round_button.dart';
 import 'package:healtho_gym/common_widget/toast_helper.dart';
 import 'package:healtho_gym/core/locale/app_localizations.dart';
-import 'package:healtho_gym/screen/login/sign_in_screen.dart';
+import 'package:healtho_gym/core/routes/app_routes.dart';
 import 'package:healtho_gym/screen/login/viewmodels/auth_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -37,10 +37,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
         // Give toast time to be visible
         await Future.delayed(const Duration(milliseconds: 1500));
         if (mounted) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const SignInScreen()),
-          );
+          AppRoutes.navigateAndClearStack(context, AppRoutes.signIn);
         }
       }
     } catch (e) {
