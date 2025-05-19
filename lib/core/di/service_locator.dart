@@ -13,8 +13,9 @@ import 'package:healtho_gym/features/login/presentation/viewmodels/user_profile_
 import 'package:healtho_gym/features/home/top_tab_view/health_tip/data/repositories/health_tip_repository.dart';
 import 'package:healtho_gym/features/home/top_tab_view/health_tip/presentation/viewmodels/health_tip_cubit.dart';
 import 'package:healtho_gym/dashboard/features/health_tip/presentation/viewmodels/health_tip_cubit.dart' as dashboard;
+import 'package:healtho_gym/core/services/one_signal_notification_service.dart';
 
-final GetIt sl = GetIt.instance;
+final sl = GetIt.instance;
 
 class ServiceLocator {
   static Future<void> init() async {
@@ -27,17 +28,27 @@ class ServiceLocator {
     sl.registerLazySingleton<HealthTipService>(() => HealthTipService());
     sl.registerLazySingleton<UserManagementService>(() => UserManagementService());
     
-    // Repositories
+    // Register notification service
+    sl.registerLazySingleton<OneSignalNotificationService>(() => OneSignalNotificationService());
+    
+    // Register repositories
     sl.registerLazySingleton<AuthRepository>(() => AuthRepository());
     sl.registerLazySingleton<UserProfileRepository>(() => UserProfileRepository());
     sl.registerLazySingleton<HealthTipRepository>(() => HealthTipRepository(sl()));
     sl.registerLazySingleton<UserManagementRepository>(() => UserManagementRepository());
     
-    // Cubits & ViewModels
+    // Register cubits
     sl.registerFactory<AuthCubit>(() => AuthCubit());
     sl.registerFactory<ProfileCubit>(() => ProfileCubit());
     sl.registerFactory<HealthTipCubit>(() => HealthTipCubit(sl()));
     sl.registerFactory<dashboard.HealthTipCubit>(() => dashboard.HealthTipCubit());
     sl.registerLazySingleton<UserManagementCubit>(() => UserManagementCubit());
+    
+    await _initThirdPartyServices();
+  }
+  
+  // Initialize third-party services
+  static Future<void> _initThirdPartyServices() async {
+    // Initialize third-party services here if needed
   }
 } 

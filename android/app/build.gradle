@@ -1,5 +1,8 @@
 plugins {
     id "com.android.application"
+    // START: FlutterFire Configuration
+    id 'com.google.gms.google-services'
+    // END: FlutterFire Configuration
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
 }
@@ -30,6 +33,7 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
+        coreLibraryDesugaringEnabled true
     }
 
     kotlinOptions {
@@ -38,6 +42,7 @@ android {
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
+        main.res.srcDirs += 'src/main/res/raw'
     }
 
     defaultConfig {
@@ -64,4 +69,19 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    
+    // إضافة إصدار متوافق من مكتبة Bouncy Castle
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
+}
+
+// إضافة حل عام للمشروع
+configurations.all {
+    resolutionStrategy {
+        // تجاهل إصدارات مكتبة bcprov غير المتوافقة
+        force 'org.bouncycastle:bcprov-jdk15on:1.70'
+        exclude group: 'org.bouncycastle', module: 'bcprov-jdk18on'
+    }
+}

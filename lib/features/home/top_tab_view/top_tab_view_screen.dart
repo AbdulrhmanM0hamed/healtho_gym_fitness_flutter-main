@@ -13,6 +13,8 @@ import 'package:healtho_gym/features/home/top_tab_view/trainer/trainer_tab_scree
 import 'package:healtho_gym/features/home/top_tab_view/workout_plan/workout_plan_screen.dart';
 import 'package:healtho_gym/features/login/presentation/viewmodels/auth_cubit/auth_cubit.dart';
 import 'package:healtho_gym/features/login/presentation/viewmodels/user_profile_cubit/profile_cubit.dart';
+import 'package:healtho_gym/core/services/one_signal_notification_service.dart';
+import 'package:http/http.dart' as http;
 
 class TopTabViewScreen extends StatefulWidget {
   const TopTabViewScreen({super.key});
@@ -21,7 +23,7 @@ class TopTabViewScreen extends StatefulWidget {
   State<TopTabViewScreen> createState() => _TopTabViewScreenState();
 }
 
-class _TopTabViewScreenState extends State<TopTabViewScreen> {
+class _TopTabViewScreenState extends State<TopTabViewScreen> with TickerProviderStateMixin {
   // Tab names
   var tapArr = [
     "نصائح صحية",
@@ -44,6 +46,9 @@ class _TopTabViewScreenState extends State<TopTabViewScreen> {
 
   int selectTab = 0;
 
+  // خدمة إشعارات OneSignal
+  late OneSignalNotificationService _notificationService;
+
   // Create all screens once
   final List<Widget> _screens = const [
     HealthTipScreen(),
@@ -53,6 +58,80 @@ class _TopTabViewScreenState extends State<TopTabViewScreen> {
     TrainerTabScreen(),
     ProfileTabScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    
+    // تهيئة خدمة الإشعارات
+    _notificationService = sl<OneSignalNotificationService>();
+  }
+
+  // اختبار إرسال إشعار
+  void _testNotification() async {
+    try {
+      await _notificationService.testNotification(
+        "اختبار الإشعارات", 
+        "هذا إشعار اختباري لتطبيق هيلثو جيم"
+      );
+      
+      // محاولة إرسال إشعار عبر الخادم (إذا كان متاحًا)
+      final isServerAvailable = await _checkServerAvailability();
+      
+      if (isServerAvailable) {
+        // إذا كان الخادم متاحًا، أرسل الإشعار عبره
+        await _notificationService.sendNotificationViaServer(
+          "اختبار الإشعارات لجميع الأجهزة",
+          "هذا إشعار اختباري لجميع مستخدمي تطبيق هيلثو جيم"
+        );
+        
+        // تنبيه نجاح
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("تم إرسال إشعار لجميع الأجهزة عبر الخادم"),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      } else {
+        // عرض رسالة حول كيفية إعداد الخادم
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("لإرسال إشعارات للأجهزة الأخرى، يرجى تشغيل خادم الإشعارات"),
+            backgroundColor: Colors.orange,
+            duration: Duration(seconds: 4),
+          ),
+        );
+      }
+      
+    } catch (error) {
+      print('خطأ في إرسال الإشعار الاختباري: $error');
+      
+      // تنبيه خطأ
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("حدث خطأ أثناء إرسال الإشعار: $error"),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+  
+  // التحقق من توفر خادم الإشعارات
+  Future<bool> _checkServerAvailability() async {
+    try {
+      // محاولة الاتصال بالخادم
+      final response = await http.get(
+        Uri.parse('http://10.0.2.2:3000/'),
+      ).timeout(const Duration(seconds: 2));
+      
+      return response.statusCode == 200;
+    } catch (e) {
+      print('خادم الإشعارات غير متاح: $e');
+      return false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,17 +154,24 @@ class _TopTabViewScreenState extends State<TopTabViewScreen> {
               fontWeight: FontWeight.w600,
             ),
           ),
-          // actions: [
-          //   IconButton(
-          //     icon: const Icon(Icons.settings, color: Colors.white),
-          //     onPressed: () {
-          //       Navigator.push(
-          //         context,
-          //         MaterialPageRoute(builder: (context) => const SettingScreen()),
-          //       );
-          //     },
-          //   ),
-          // ],
+          actions: [
+            // زر اختبار الإشعارات
+            IconButton(
+              icon: const Icon(Icons.notifications_active, color: Colors.white),
+              tooltip: 'اختبار الإشعارات',
+              onPressed: _testNotification,
+            ),
+            // زر الإعدادات
+            IconButton(
+              icon: const Icon(Icons.settings, color: Colors.white),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SettingScreen()),
+                );
+              },
+            ),
+          ],
         ),
         body: Column(
           children: [

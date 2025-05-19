@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:healtho_gym/firebase_options.dart';
 import 'package:healtho_gym/core/di/service_locator.dart';
 import 'package:healtho_gym/core/locale/app_localizations.dart';
 import 'package:healtho_gym/core/locale/locale_provider.dart';
@@ -11,6 +13,8 @@ import 'package:healtho_gym/core/theme/theme_provider.dart';
 import 'package:healtho_gym/dashboard/app/dashboard_app.dart';
 import 'package:healtho_gym/features/splash/splash_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:healtho_gym/core/services/one_signal_notification_service.dart';
 
 // To use the dashboard, comment out this line and uncomment the next line
 // void main() async {
@@ -25,6 +29,14 @@ void main() async {
 // Mobile application entry point
 void mainMobile() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // تهيئة Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  
+  // تهيئة OneSignal
+  _initOneSignal();
   
   // Initialize Preferences
   await AppPreferences().init();
@@ -43,9 +55,48 @@ void mainMobile() async {
   );
 }
 
+// تهيئة OneSignal
+void _initOneSignal() {
+  // إعداد مستوى السجل للتصحيح
+  OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+  
+  // تهيئة OneSignal بمعرف التطبيق
+  OneSignal.initialize("897f8d3f-91cb-4fd1-b5f9-570e9c73cfe6");
+  
+  // طلب إذن الإشعارات
+  try {
+    OneSignal.Notifications.requestPermission(true);
+  } catch (e) {
+    print("خطأ في طلب أذونات الإشعارات: $e");
+    // استمر رغم الخطأ
+  }
+  
+  // إعداد معالج النقر على الإشعارات
+  try {
+    OneSignal.Notifications.addClickListener((event) {
+      print("تم النقر على إشعار OneSignal: ${event.notification.additionalData}");
+    });
+  } catch (e) {
+    print("خطأ في إضافة مستمع النقر على الإشعارات: $e");
+  }
+  
+  // إضافة تأخير قبل تهيئة خدمة الإشعارات المخصصة
+  // للسماح لـ OneSignal بالتسجيل أولاً
+  Future.delayed(const Duration(seconds: 3), () {
+    // تهيئة خدمة الإشعارات المخصصة
+    OneSignalNotificationService();
+    print("تم تهيئة خدمة الإشعارات المخصصة بعد تأخير");
+  });
+}
+
 // Dashboard application entry point
 void mainDashboard() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // تهيئة Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   
   // Initialize ServiceLocator
   await ServiceLocator.init();

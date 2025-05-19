@@ -193,6 +193,9 @@ class HealthTipsListScreen extends StatelessWidget {
   }
   
   void _showDeleteConfirmation(BuildContext context, HealthTipModel tip) {
+    // Capture the cubit before showing the dialog
+    final healthTipCubit = context.read<HealthTipCubit>();
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -207,7 +210,8 @@ class HealthTipsListScreen extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
-              context.read<HealthTipCubit>().deleteHealthTip(tip.id);
+              // Use the captured cubit instance
+              healthTipCubit.deleteHealthTip(tip.id);
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(

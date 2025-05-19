@@ -28,12 +28,16 @@ environment:
 dependencies:
   another_flushbar: ^1.12.30
   cached_network_image: ^3.4.1
+  cloud_functions: ^5.5.0
   cupertino_icons: ^1.0.2
   dio: ^5.4.0
   equatable: ^2.0.7
+  firebase_core: ^3.13.0
+  firebase_messaging: ^15.2.5
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1
+  flutter_local_notifications: ^19.2.1
   flutter_localizations:
     sdk: flutter
   flutter_rating_bar: ^4.0.1
@@ -42,17 +46,19 @@ dependencies:
   fluttertoast: ^8.2.4
   form_validator: ^2.1.1
   get_it: ^8.0.3
+  http: ^1.1.0
   image_picker: ^1.1.2
   intl: ^0.19.0
   logger: ^2.0.2+1
+  onesignal_flutter: ^5.3.2
   otp_text_field_v2: ^1.0.3
   otp_timer_button: ^1.1.1
+  photo_view: ^0.14.0
   provider: ^6.1.1
   shared_preferences: ^2.2.2
   shimmer: ^3.0.0
-  supabase_flutter: ^2.3.2
+  supabase_flutter: ^2.9.0
   uuid: ^4.3.3
-  photo_view: ^0.14.0
 
 dev_dependencies:
   build_runner: ^2.4.15
@@ -74,6 +80,7 @@ flutter:
   assets:
     - assets/img/
     - assets/img/tab_bar/
+    - assets/audio/
   #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

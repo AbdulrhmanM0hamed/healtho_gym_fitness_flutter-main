@@ -74,7 +74,7 @@ class _AddHealthTipScreenState extends State<AddHealthTipScreen> {
     });
   }
 
-  void _submitForm() async {
+  void _submitForm(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       final cubit = context.read<HealthTipCubit>();
       
@@ -104,7 +104,7 @@ class _AddHealthTipScreenState extends State<AddHealthTipScreen> {
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Health tip added successfully'),
+            content: Text('تم إضافة النصيحة وإرسال إشعار للمستخدمين بنجاح'),
             backgroundColor: Colors.green,
           ),
         );
@@ -268,7 +268,7 @@ class _AddHealthTipScreenState extends State<AddHealthTipScreen> {
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: state.isLoading ? null : _submitForm,
+                      onPressed: state.isLoading ? null : () => _submitForm(context),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: TColor.secondary,
                         foregroundColor: Colors.white,

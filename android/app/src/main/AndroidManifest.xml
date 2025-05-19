@@ -1,4 +1,9 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <!-- Add internet permission -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    
     <application
         android:label="healtho_gym"
         android:name="${applicationName}"
@@ -24,6 +29,14 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        
+        <!-- Add OneSignal PermissionsActivity with tools:replace attributes -->
+        <activity
+            android:name="com.onesignal.core.activities.PermissionsActivity"
+            android:theme="@style/AppTheme.FullScreenDialog"
+            android:exported="true"
+            tools:replace="android:exported,android:theme" />
+            
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

@@ -1,6 +1,8 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 import '../models/health_tip_model.dart';
+import 'package:healtho_gym/core/services/one_signal_notification_service.dart';
+import 'package:healtho_gym/core/di/service_locator.dart';
 
 class HealthTipService {
   final SupabaseClient _supabase = Supabase.instance.client;
@@ -69,6 +71,30 @@ class HealthTipService {
     await _supabase
         .from(_tableName)
         .insert(healthTip.toJson());
+    
+    // إرسال إشعار بعد إضافة النصيحة بنجاح
+    try {
+      final notificationService = sl<OneSignalNotificationService>();
+      
+      // 1. إرسال إشعار محلي للجهاز الحالي
+      await notificationService.sendNewHealthTipNotification(healthTip);
+      print('تم إرسال الإشعار المحلي بنجاح للنصيحة الجديدة: ${healthTip.title}');
+      
+      // 2. محاولة إرسال الإشعار عبر خادم OneSignal لجميع المستخدمين
+      try {
+        await notificationService.sendNotificationViaServer(
+          healthTip.title,
+          healthTip.subtitle,
+        );
+        print('تم إرسال الإشعار بنجاح لجميع المستخدمين');
+      } catch (serverError) {
+        print('لم يتم إرسال الإشعار عبر الخادم: $serverError');
+        // استمر في العملية حتى لو فشل إرسال الإشعار عبر الخادم
+      }
+    } catch (e) {
+      print('خطأ في إرسال الإشعار: $e');
+      // نستمر في التنفيذ حتى لو فشل الإشعار
+    }
     
     return healthTip.id;
   }
