@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:healtho_gym/common/color_extension.dart';
+import 'package:healtho_gym/core/di/service_locator.dart';
+import 'package:healtho_gym/dashboard/features/exercise/presentation/screens/all_exercises_screen.dart';
+import 'package:healtho_gym/dashboard/features/exercise/presentation/viewmodels/exercise_cubit.dart';
+import 'package:healtho_gym/dashboard/features/exercise_category/presentation/viewmodels/exercise_category_cubit.dart';
 import 'package:healtho_gym/dashboard/features/health_tip/presentation/screens/health_tips_list_screen.dart';
 import 'package:healtho_gym/dashboard/features/user/presentation/screens/users_list_screen.dart';
+import 'package:healtho_gym/dashboard/features/exercise_category/presentation/screens/exercise_categories_screen.dart';
 import 'package:healtho_gym/dashboard/presentation/widgets/dashboard_menu_item.dart';
 import 'package:healtho_gym/dashboard/routes/dashboard_routes.dart';
 
@@ -20,6 +26,17 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen> {
     const Center(child: Text('Dashboard Overview')),
     const HealthTipsListScreen(),
     const UsersListScreen(),
+    BlocProvider(
+      create: (context) => sl<ExerciseCategoryCubit>()..loadCategories(),
+      child: const ExerciseCategoriesScreen(),
+    ),
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => sl<ExerciseCubit>()),
+        BlocProvider(create: (context) => sl<ExerciseCategoryCubit>()),
+      ],
+      child: const AllExercisesScreen(),
+    ),
     const Center(child: Text('Settings')),
   ];
 
@@ -45,14 +62,7 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen> {
             _scaffoldKey.currentState!.openDrawer();
           },
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white),
-            onPressed: () {
-              Navigator.pushReplacementNamed(context, DashboardRoutes.login);
-            },
-          ),
-        ],
+     
       ),
       drawer: Drawer(
         child: ListView(
@@ -111,10 +121,22 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen> {
               onTap: () => _onItemTapped(2),
             ),
             DashboardMenuItem(
-              icon: Icons.settings,
-              title: 'Settings',
+              icon: Icons.category,
+              title: 'Exercise Categories',
               isSelected: _selectedIndex == 3,
               onTap: () => _onItemTapped(3),
+            ),
+            DashboardMenuItem(
+              icon: Icons.fitness_center,
+              title: 'All Exercises',
+              isSelected: _selectedIndex == 4,
+              onTap: () => _onItemTapped(4),
+            ),
+            DashboardMenuItem(
+              icon: Icons.settings,
+              title: 'Settings',
+              isSelected: _selectedIndex == 5,
+              onTap: () => _onItemTapped(5),
             ),
             const Divider(),
             ListTile(
@@ -158,6 +180,16 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen> {
                   icon: Icon(Icons.people_outline),
                   selectedIcon: Icon(Icons.people),
                   label: Text('Users'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.category_outlined),
+                  selectedIcon: Icon(Icons.category),
+                  label: Text('Exercise Categories'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.fitness_center_outlined),
+                  selectedIcon: Icon(Icons.fitness_center),
+                  label: Text('All Exercises'),
                 ),
                 NavigationRailDestination(
                   icon: Icon(Icons.settings_outlined),

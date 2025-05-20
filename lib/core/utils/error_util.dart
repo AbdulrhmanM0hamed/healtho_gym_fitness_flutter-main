@@ -113,4 +113,11 @@ class ErrorUtil {
         return 'يرجى التأكد من إدخال بيانات صحيحة.';
     }
   }
+
+  static String getErrorMessage(dynamic error) {
+    if (error is Exception) {
+      return error.toString().replaceAll('Exception: ', '');
+    }
+    return error?.toString() ?? 'حدث خطأ غير متوقع';
+  }
 } 

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:healtho_gym/common/color_extension.dart';
 import 'package:healtho_gym/common_widget/round_button.dart';
 import 'package:healtho_gym/core/locale/app_localizations.dart';
-import 'package:healtho_gym/core/locale/locale_provider.dart';
 import 'package:healtho_gym/core/preferences/app_preferences.dart';
 import 'package:healtho_gym/core/routes/app_routes.dart';
 import 'package:provider/provider.dart';
@@ -29,12 +28,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void initState() {
     super.initState();
     // Ensure locale is set to Arabic by default
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
-      if (localeProvider.languageCode != 'ar') {
-        localeProvider.setArabic();
-      }
-    });
+
   }
   
   @override

@@ -5,6 +5,7 @@ import 'package:healtho_gym/core/di/service_locator.dart';
 import 'package:healtho_gym/dashboard/features/user/presentation/viewmodels/user_management_cubit.dart';
 import 'package:healtho_gym/dashboard/features/user/presentation/viewmodels/user_management_state.dart';
 import 'package:healtho_gym/features/login/data/models/user_profile_model.dart';
+import 'package:healtho_gym/common_widget/toast_helper.dart';
 
 class UsersListScreen extends StatefulWidget {
   const UsersListScreen({super.key});
@@ -33,152 +34,224 @@ class _UsersListScreenState extends State<UsersListScreen> {
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: _userManagementCubit,
-      child: Builder(
-        builder: (context) {
-          return Scaffold(
-            body: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Users Management',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Expanded(
-                    child: BlocBuilder<UserManagementCubit, UserManagementState>(
-                      builder: (context, state) {
-                        if (state.isLoading && state.users.isEmpty) {
-                          return const Center(child: CircularProgressIndicator());
-                        }
-                        
-                        if (state.hasError) {
-                          return Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Error: ${state.errorMessage}',
-                                  style: const TextStyle(color: Colors.red),
-                                ),
-                                const SizedBox(height: 10),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    context.read<UserManagementCubit>().loadUsers();
-                                  },
-                                  child: const Text('Retry'),
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-                        
-                        if (state.users.isEmpty) {
-                          return const Center(
-                            child: Text('No users found.'),
-                          );
-                        }
-                        
-                        return Card(
-                          elevation: 2,
-                          child: Column(
-                            children: [
-                              Expanded(
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: DataTable(
-                                    columns: const [
-                                      DataColumn(label: Text('User ID')),
-                                      DataColumn(label: Text('Full Name')),
-                                      DataColumn(label: Text('Admin Status')),
-                                      DataColumn(label: Text('Last Updated')),
-                                      DataColumn(label: Text('Actions')),
-                                    ],
-                                    rows: state.users.map((user) {
-                                      final profile = user.profile;
-                                      if (profile == null) {
-                                        return DataRow(
-                                          cells: [
-                                            DataCell(Text(user.id)),
-                                            const DataCell(Text('Profile Not Set')),
-                                            const DataCell(Text('No')),
-                                            const DataCell(Text('Never')),
-                                            const DataCell(Text('N/A')),
-                                          ],
-                                        );
-                                      }
-                                      
-                                      return DataRow(
-                                        cells: [
-                                          DataCell(Text(profile.userId)),
-                                          DataCell(Text(profile.fullName ?? 'Not Set')),
-                                          DataCell(
-                                            Switch(
-                                              value: profile.isAdmin,
-                                              activeColor: Colors.amber,
-                                              onChanged: (value) {
-                                                _showAdminStatusConfirmation(
-                                                  context, 
-                                                  profile, 
-                                                  value,
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                          DataCell(Text(
-                                            profile.updateDate != null
-                                                ? _formatDate(profile.updateDate!)
-                                                : 'Never',
-                                          )),
-                                          DataCell(
-                                            Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                IconButton(
-                                                  icon: const Icon(Icons.visibility),
-                                                  color: Colors.blue,
-                                                  onPressed: () {
-                                                    _showUserDetails(context, user);
-                                                  },
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    }).toList(),
-                                  ),
-                                ),
-                              ),
-                              
-                              // Load more button
-                              if (state.hasMoreItems)
-                                Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: ElevatedButton(
-                                    onPressed: state.isLoading 
-                                        ? null 
-                                        : () => context.read<UserManagementCubit>().loadMoreUsers(),
-                                    child: state.isLoading
-                                        ? const CircularProgressIndicator()
-                                        : const Text('Load More'),
-                                  ),
-                                ),
-                            ],
+      child: Scaffold(
+        backgroundColor: Colors.grey[100],
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(70),
+          child: Container(
+            decoration: BoxDecoration(
+              color: TColor.secondary,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          'إدارة المستخدمين',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
                           ),
-                        );
-                      },
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'عرض وتعديل صلاحيات المستخدمين',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.8),
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
+                    IconButton(
+                      onPressed: () => context.read<UserManagementCubit>().loadUsers(),
+                      icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+                      tooltip: 'تحديث القائمة',
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.white.withOpacity(0.1),
+                        padding: const EdgeInsets.all(12),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          );
-        }
+          ),
+        ),
+        body: BlocConsumer<UserManagementCubit, UserManagementState>(
+          listener: (context, state) {
+            if (state.hasError) {
+              ToastHelper.showFlushbar(
+                context: context,
+                title: 'خطأ',
+                message: state.errorMessage ?? 'حدث خطأ غير متوقع',
+                type: ToastType.error,
+              );
+            }
+          },
+          builder: (context, state) {
+            if (state.isLoading && state.users.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(color: TColor.primary),
+                    const SizedBox(height: 16),
+                    Text(
+                      'جاري تحميل المستخدمين...',
+                      style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                    ),
+                  ],
+                ),
+              );
+            }
+            if (state.hasError) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.error_outline_rounded, color: Colors.red, size: 48),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'عذراً، حدث خطأ',
+                      style: TextStyle(color: Colors.grey[800], fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      state.errorMessage ?? '',
+                      style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton.icon(
+                      onPressed: () => context.read<UserManagementCubit>().loadUsers(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: TColor.primary,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+                      label: const Text(
+                        'إعادة المحاولة',
+                        style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+            if (state.users.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.people_outline, size: 64, color: Colors.grey[400]),
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'لا يوجد مستخدمون',
+                      style: TextStyle(color: Colors.grey[800], fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'لم يتم العثور على أي مستخدمين حتى الآن',
+                      style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return RefreshIndicator(
+              onRefresh: () async {
+                context.read<UserManagementCubit>().loadUsers();
+              },
+              color: TColor.primary,
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: state.users.length + (state.hasMoreItems ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index == state.users.length) {
+                    return _buildLoadMoreButton(context, state);
+                  }
+                  final user = state.users[index];
+                  final profile = user.profile;
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: TColor.primary.withOpacity(0.1),
+                        child: Icon(
+                          profile?.isAdmin == true ? Icons.admin_panel_settings : Icons.person,
+                          color: profile?.isAdmin == true ? Colors.amber : TColor.primary,
+                        ),
+                      ),
+                      title: Text(profile?.fullName ?? user.id, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(user.email ?? '---', style: TextStyle(color: Colors.grey[700], fontSize: 13)),
+                          if (profile?.updateDate != null)
+                            Text('آخر تحديث: ${_formatDate(profile!.updateDate!)}', style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+                        ],
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Switch(
+                            value: profile?.isAdmin ?? false,
+                            activeColor: Colors.amber,
+                            onChanged: profile == null
+                                ? null
+                                : (value) => _showAdminStatusConfirmation(context, profile, value),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.visibility_rounded),
+                            color: TColor.primary,
+                            tooltip: 'عرض التفاصيل',
+                            onPressed: () => _showUserDetails(context, user),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -187,54 +260,77 @@ class _UsersListScreenState extends State<UsersListScreen> {
     return '${date.day}/${date.month}/${date.year}';
   }
   
+  Widget _buildLoadMoreButton(BuildContext context, UserManagementState state) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: ElevatedButton(
+          onPressed: state.isLoading
+              ? null
+              : () => context.read<UserManagementCubit>().loadMoreUsers(),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: TColor.primary,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: state.isLoading
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              : const Text(
+                  'تحميل المزيد',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+        ),
+      ),
+    );
+  }
+  
   void _showAdminStatusConfirmation(
     BuildContext context, 
     UserProfileModel profile, 
     bool newStatus,
   ) {
-    final action = newStatus ? 'grant' : 'revoke';
-    
+    final action = newStatus ? 'منح' : 'سحب';
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text('$action Admin Access'),
-        content: Text(
-          'Are you sure you want to $action admin privileges for ${profile.fullName ?? profile.userId}?'
+        title: Text('$action صلاحية الأدمن'),
+        content: Text('هل أنت متأكد من $action صلاحية الأدمن للمستخدم "${profile.fullName ?? profile.userId}"؟'),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-            },
-            child: const Text('Cancel'),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('إلغاء'),
           ),
-          TextButton(
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.amber,
+              foregroundColor: Colors.black,
+            ),
             onPressed: () {
-              // Get the cubit reference from the context captured in the outer function
-              final cubit = context.read<UserManagementCubit>();
-              
-              // Call the method
-              cubit.toggleAdminStatus(
-                profile.id,
-                profile.userId,
-                newStatus,
-              );
-              
+              context.read<UserManagementCubit>().toggleAdminStatus(profile.id, profile.userId, newStatus);
               Navigator.pop(dialogContext);
-              
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Admin status ${newStatus ? 'granted' : 'revoked'} successfully'),
-                  backgroundColor: Colors.green,
-                ),
+              ToastHelper.showFlushbar(
+                context: context,
+                title: 'تم التحديث',
+                message: newStatus ? 'تم منح صلاحية الأدمن' : 'تم سحب صلاحية الأدمن',
+                type: ToastType.success,
               );
             },
-            child: Text(
-              newStatus ? 'Grant Access' : 'Revoke Access',
-              style: TextStyle(
-                color: newStatus ? Colors.green : Colors.red,
-              ),
-            ),
+            child: Text('$action'),
           ),
         ],
       ),
@@ -242,70 +338,16 @@ class _UsersListScreenState extends State<UsersListScreen> {
   }
   
   void _showUserDetails(BuildContext context, dynamic user) {
-    final profile = user.profile;
-    if (profile == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No profile available for this user'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-    
+    // TODO: Implement user details dialog or screen
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('User Profile Details'),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildDetailRow('User ID:', profile.userId),
-              _buildDetailRow('Full Name:', profile.fullName),
-              _buildDetailRow('Age:', profile.age?.toString()),
-              _buildDetailRow('Height:', profile.height != null 
-                  ? '${profile.height} cm' : null),
-              _buildDetailRow('Weight:', profile.weight != null 
-                  ? '${profile.weight} kg' : null),
-              _buildDetailRow('Goal:', profile.goal),
-              _buildDetailRow('Fitness Level:', profile.fitnessLevel),
-              _buildDetailRow('Admin Status:', profile.isAdmin ? 'Yes' : 'No'),
-              _buildDetailRow('Last Updated:', profile.updateDate != null 
-                  ? _formatDate(profile.updateDate!) : 'Never'),
-            ],
-          ),
-        ),
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('تفاصيل المستخدم'),
+        content: Text('ID: ${user.id}\nEmail: ${user.profile?.email ?? "---"}'),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text('Close'),
-          ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildDetailRow(String label, String? value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 100,
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(value ?? 'Not set'),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('إغلاق'),
           ),
         ],
       ),

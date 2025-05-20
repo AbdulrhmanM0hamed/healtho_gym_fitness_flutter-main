@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:healtho_gym/common/color_extension.dart';
-import 'package:healtho_gym/features/home/top_tab_view/exercises/exercises_cell.dart';
+import 'package:healtho_gym/features/home/top_tab_view/exercises/data/models/exercise_category_model.dart';
+import 'package:healtho_gym/features/home/top_tab_view/exercises/presentation/widgets/exercises_category_card.dart';
 import 'package:healtho_gym/features/home/top_tab_view/exercises/exercises_name_screen.dart';
 import 'package:healtho_gym/features/home/top_tab_view/workout_plan/workout_detail_screen.dart';
 
@@ -58,15 +59,25 @@ class _ChallengesScreenState extends State<ChallengesScreen> {
           crossAxisSpacing: 15,
           mainAxisSpacing: 15),
       itemBuilder: (context, index) {
-        var obj = listArr[index] as Map? ?? {};
+  final data = listArr[index];
+  final ExerciseCategory obj = ExerciseCategory(
+    id: 1,
+    title: data["title"] ?? "",
+    titleAr: data["titleAr"] ?? "",
+    imageUrl: data["image"] ?? "",
+    exercisesCount: data["exercisesCount"] ?? 0,
+    createdAt: DateTime.now(),
+    updatedAt: DateTime.now(),
+  );
 
-        return ExercisesCell(
-          obj: obj,
-          onPressed: () {
-            context.push(const WorkoutDetailScreen());
-          },
-        );
-      },
+  return ExercisesCategoryCard(
+    category: obj,
+    onPressed: () {
+      context.push(const WorkoutDetailScreen());
+    },
+  );
+},
+
       itemCount: listArr.length,
     ));
   }

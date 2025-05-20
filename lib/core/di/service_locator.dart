@@ -1,4 +1,11 @@
 import 'package:get_it/get_it.dart';
+import 'package:healtho_gym/dashboard/features/exercise/data/repositories/exercise_repository.dart' as dashboard_exercise;
+import 'package:healtho_gym/dashboard/features/exercise/presentation/viewmodels/exercise_cubit.dart';
+import 'package:healtho_gym/dashboard/features/exercise_category/data/repositories/exercise_category_repository.dart';
+import 'package:healtho_gym/dashboard/features/exercise_category/presentation/viewmodels/exercise_category_cubit.dart';
+import 'package:healtho_gym/features/home/top_tab_view/exercises/data/repositories/exercise_repository.dart';
+import 'package:healtho_gym/features/home/top_tab_view/exercises/presentation/cubits/exercises_category_cubit.dart';
+import 'package:healtho_gym/features/home/top_tab_view/exercises/presentation/cubits/exercises_cubit.dart';
 import 'package:healtho_gym/features/login/data/repositories/auth_repository.dart';
 import 'package:healtho_gym/features/login/data/repositories/user_profile_repository.dart';
 import 'package:healtho_gym/core/services/auth_service.dart';
@@ -14,6 +21,7 @@ import 'package:healtho_gym/features/home/top_tab_view/health_tip/data/repositor
 import 'package:healtho_gym/features/home/top_tab_view/health_tip/presentation/viewmodels/health_tip_cubit.dart';
 import 'package:healtho_gym/dashboard/features/health_tip/presentation/viewmodels/health_tip_cubit.dart' as dashboard;
 import 'package:healtho_gym/core/services/one_signal_notification_service.dart';
+import 'package:healtho_gym/core/services/storage_service.dart';
 
 final sl = GetIt.instance;
 
@@ -21,34 +29,48 @@ class ServiceLocator {
   static Future<void> init() async {
     // Initialize Supabase service
     await SupabaseService.initialize();
-    
+
     // Core services
     sl.registerLazySingleton<AuthService>(() => AuthService());
     sl.registerLazySingleton<UserProfileService>(() => UserProfileService());
     sl.registerLazySingleton<HealthTipService>(() => HealthTipService());
     sl.registerLazySingleton<UserManagementService>(() => UserManagementService());
-    
+    sl.registerLazySingleton<StorageService>(() => StorageService());
+
     // Register notification service
     sl.registerLazySingleton<OneSignalNotificationService>(() => OneSignalNotificationService());
-    
+
     // Register repositories
     sl.registerLazySingleton<AuthRepository>(() => AuthRepository());
     sl.registerLazySingleton<UserProfileRepository>(() => UserProfileRepository());
     sl.registerLazySingleton<HealthTipRepository>(() => HealthTipRepository(sl()));
     sl.registerLazySingleton<UserManagementRepository>(() => UserManagementRepository());
+    sl.registerLazySingleton<ExerciseRepository>(() => ExerciseRepository());
     
+    // Dashboard repositories
+    sl.registerLazySingleton<ExerciseCategoryRepository>(() => ExerciseCategoryRepository());
+    sl.registerLazySingleton<dashboard_exercise.ExerciseRepository>(() => dashboard_exercise.ExerciseRepository());
+
     // Register cubits
     sl.registerFactory<AuthCubit>(() => AuthCubit());
     sl.registerFactory<ProfileCubit>(() => ProfileCubit());
     sl.registerFactory<HealthTipCubit>(() => HealthTipCubit(sl()));
     sl.registerFactory<dashboard.HealthTipCubit>(() => dashboard.HealthTipCubit());
-    sl.registerLazySingleton<UserManagementCubit>(() => UserManagementCubit());
-    
+    sl.registerFactory<UserManagementCubit>(() => UserManagementCubit());
+
+    // Exercise cubits (mobile app)
+    sl.registerFactory<ExercisesCategoryCubit>(() => ExercisesCategoryCubit(sl()));
+    sl.registerFactory<ExercisesCubit>(() => ExercisesCubit(sl()));
+
+    // Exercise cubits (dashboard)
+    sl.registerFactory<ExerciseCategoryCubit>(() => ExerciseCategoryCubit(sl(), sl<StorageService>()));
+    sl.registerFactory<ExerciseCubit>(() => ExerciseCubit(sl(), sl<StorageService>()));
+
     await _initThirdPartyServices();
   }
-  
+
   // Initialize third-party services
   static Future<void> _initThirdPartyServices() async {
     // Initialize third-party services here if needed
   }
-} 
+}

@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:healtho_gym/common/color_extension.dart';
 import 'package:healtho_gym/core/di/service_locator.dart';
 import 'package:healtho_gym/core/locale/app_localizations.dart';
-import 'package:healtho_gym/core/locale/locale_provider.dart';
 import 'package:healtho_gym/core/preferences/app_preferences.dart';
 import 'package:healtho_gym/core/routes/app_routes.dart';
 import 'package:healtho_gym/features/login/data/repositories/auth_repository.dart';
@@ -54,7 +53,6 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     final locale = AppLocalizations.of(context);
-    final localeProvider = Provider.of<LocaleProvider>(context);
     
     return Directionality(
       textDirection: TextDirection.rtl, // Always RTL for Arabic

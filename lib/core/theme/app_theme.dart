@@ -1,420 +1,150 @@
 import 'package:flutter/material.dart';
-import 'package:healtho_gym/common/color_extension.dart';
+import 'package:healtho_gym/core/theme/app_colors.dart';
+import 'custom_themes/appbar_theme.dart';
+import 'custom_themes/bottom_sheet_theme.dart';
+import 'custom_themes/checkbox_theme.dart';
+import 'custom_themes/chip_theme.dart';
+import 'custom_themes/elevated_button_theme.dart';
+import 'custom_themes/outline_button_theme.dart';
+import 'custom_themes/text_field_theme.dart';
+import 'custom_themes/text_theme.dart';
+
 
 class AppTheme {
-  static final ThemeData lightTheme = ThemeData(
-    brightness: Brightness.light,
+  AppTheme._();
+
+  static ThemeData lightTheme = ThemeData(
+    useMaterial3: true,
     fontFamily: 'Cairo',
+    brightness: Brightness.light,
+    primaryColor: AppColors.primary,
     scaffoldBackgroundColor: Colors.white,
-    primaryColor: TColor.primary,
-    hintColor: TColor.secondaryText,
-    
-    // AppBar Theme
-    appBarTheme: const AppBarTheme(
-      elevation: 0,
-      centerTitle: true,
-      backgroundColor: Colors.transparent,
-      titleTextStyle: TextStyle(
-        fontFamily: 'Cairo',
-        color: Colors.black,
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
-      ),
-      iconTheme: IconThemeData(color: Colors.black),
+    textTheme: TTextTheme.lightTextTheme,
+    elevatedButtonTheme: TElevatedButtonTheme.lightElevatedButtonTheme,
+    appBarTheme: TAppBarTheme.lightAppBarTheme,
+    bottomSheetTheme: TBottomSheetTheme.lightBottomSheetTheme,
+    checkboxTheme: TCheckboxTheme.lightCheckboxTheme,
+    chipTheme: TChipTheme.lightChipTheme,
+    inputDecorationTheme: TTextFormFieldTheme.lightInputDecorationTheme,
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: TOutlinedButtonTheme.lightOutlinedButtonTheme,
     ),
-    
-    // Text Theme
-    textTheme: const TextTheme(
-      displayLarge: TextStyle(
-        fontFamily: 'Cairo',
-        fontSize: 32,
-        fontWeight: FontWeight.bold,
-        color: Colors.black,
-      ),
-      displayMedium: TextStyle(
-        fontFamily: 'Cairo',
-        fontSize: 28,
-        fontWeight: FontWeight.bold,
-        color: Colors.black,
-      ),
-      displaySmall: TextStyle(
-        fontFamily: 'Cairo',
-        fontSize: 24,
-        fontWeight: FontWeight.bold,
-        color: Colors.black,
-      ),
-      headlineMedium: TextStyle(
-        fontFamily: 'Cairo',
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-        color: Colors.black,
-      ),
-      titleLarge: TextStyle(
-        fontFamily: 'Cairo',
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
-        color: Colors.black,
-      ),
-      titleMedium: TextStyle(
-        fontFamily: 'Cairo',
-        fontSize: 16,
-        fontWeight: FontWeight.w500,
-        color: Colors.black,
-      ),
-      bodyLarge: TextStyle(
-        fontFamily: 'Cairo',
-        fontSize: 16,
-        fontWeight: FontWeight.normal,
-        color: Colors.black,
-      ),
-      bodyMedium: TextStyle(
-        fontFamily: 'Cairo',
-        fontSize: 14,
-        fontWeight: FontWeight.normal,
-        color: Colors.black,
-      ),
-      bodySmall: TextStyle(
-        fontFamily: 'Cairo',
-        fontSize: 12,
-        fontWeight: FontWeight.normal,
-        color: Colors.black87,
-      ),
-    ),
-    
-    // Button Theme
-    buttonTheme: const ButtonThemeData(
-      buttonColor: Color(0xFF8C10B8),
-      disabledColor: Colors.grey,
-      splashColor: Color(0xFF7000AB),
-      textTheme: ButtonTextTheme.primary,
-    ),
-    
-    // ElevatedButton Theme
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        foregroundColor: Colors.white,
-        backgroundColor: TColor.primary,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
-        elevation: 0,
-        textStyle: const TextStyle(
-          fontFamily: 'Cairo',
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-        ),
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-      ),
-    ),
-    
-    // Text Button Theme
-    textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(
-        foregroundColor: TColor.primary,
-        textStyle: const TextStyle(
-          fontFamily: 'Cairo',
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    ),
-    
-    // Input Decoration Theme
-    inputDecorationTheme: InputDecorationTheme(
-      filled: true,
-      fillColor: TColor.textFieldBg,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
-        borderSide: BorderSide.none,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
-        borderSide: BorderSide.none,
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
-        borderSide: BorderSide(color: TColor.primary, width: 1.5),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
-        borderSide: const BorderSide(color: Colors.red, width: 1.5),
-      ),
-      hintStyle: TextStyle(
-        fontFamily: 'Cairo',
-        color: TColor.secondaryText,
-        fontSize: 14,
-      ),
-      labelStyle: const TextStyle(
-        fontFamily: 'Cairo',
-        color: Colors.black87,
-        fontSize: 14,
-      ),
-    ),
-    
-    // Checkbox Theme
-    checkboxTheme: CheckboxThemeData(
-      fillColor: MaterialStateProperty.resolveWith<Color>((states) {
-        if (states.contains(MaterialState.selected)) {
-          return TColor.primary;
-        }
-        return Colors.transparent;
-      }),
-      side: BorderSide(color: TColor.primary),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(4),
-      ),
-    ),
-    
-    // Card Theme
-    cardTheme: CardTheme(
-      color: Colors.white,
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-    ),
-    
-    // Bottom Navigation Bar Theme
-    bottomNavigationBarTheme: BottomNavigationBarThemeData(
-      backgroundColor: Colors.white,
-      selectedItemColor: TColor.primary,
-      unselectedItemColor: Colors.grey,
-      selectedLabelStyle: const TextStyle(
-        fontFamily: 'Cairo',
-        fontSize: 12,
-        fontWeight: FontWeight.w600,
-      ),
-      unselectedLabelStyle: const TextStyle(
-        fontFamily: 'Cairo',
-        fontSize: 12,
-        fontWeight: FontWeight.normal,
-      ),
-      type: BottomNavigationBarType.fixed,
-      elevation: 8,
-    ),
-    
-    colorScheme: ColorScheme.light(
-      primary: TColor.primary,
-      secondary: TColor.secondary,
+    colorScheme: const ColorScheme.light(
+      primary: AppColors.primary,
+      secondary: AppColors.secondary,
       surface: Colors.white,
       background: Colors.white,
-      error: Colors.red,
-      onPrimary: Colors.white,
-      onSecondary: Colors.white,
-      onSurface: Colors.black,
-      onBackground: Colors.black,
-      onError: Colors.white,
-      brightness: Brightness.light,
+      error: AppColors.error,
     ),
+    cardColor: Colors.white,
+    shadowColor: Colors.black.withOpacity(0.04),
+    dividerColor: Colors.grey.shade200,
+    extensions: [
+      CustomColors.light,
+    ],
   );
 
-  static final ThemeData darkTheme = ThemeData(
-    brightness: Brightness.dark,
+  static ThemeData darkTheme = ThemeData(
+    useMaterial3: true,
     fontFamily: 'Cairo',
-    scaffoldBackgroundColor: const Color(0xFF121212),
-    primaryColor: TColor.primary,
-    hintColor: Colors.grey,
-    
-    // AppBar Theme
-    appBarTheme: const AppBarTheme(
-      elevation: 0,
-      centerTitle: true,
-      backgroundColor: Colors.transparent,
-      titleTextStyle: TextStyle(
-        fontFamily: 'Cairo',
-        color: Colors.white,
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
-      ),
-      iconTheme: IconThemeData(color: Colors.white),
+    brightness: Brightness.dark,
+    primaryColor: AppColors.primary,
+    scaffoldBackgroundColor: const Color(0xFF1A1A1A),
+    textTheme: TTextTheme.darkTextTheme,
+    elevatedButtonTheme: TElevatedButtonTheme.darkElevatedButtonTheme,
+    appBarTheme: TAppBarTheme.darkAppBarTheme,
+    bottomSheetTheme: TBottomSheetTheme.darkBottomSheetTheme,
+    checkboxTheme: TCheckboxTheme.darkCheckboxTheme,
+    chipTheme: TChipTheme.darkChipTheme,
+    inputDecorationTheme: TTextFormFieldTheme.darkInputDecorationTheme,
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: TOutlinedButtonTheme.darkOutlinedButtonTheme,
     ),
-    
-    // Text Theme
-    textTheme: const TextTheme(
-      displayLarge: TextStyle(
-        fontFamily: 'Cairo',
-        fontSize: 32,
-        fontWeight: FontWeight.bold,
-        color: Colors.white,
-      ),
-      displayMedium: TextStyle(
-        fontFamily: 'Cairo',
-        fontSize: 28,
-        fontWeight: FontWeight.bold,
-        color: Colors.white,
-      ),
-      displaySmall: TextStyle(
-        fontFamily: 'Cairo',
-        fontSize: 24,
-        fontWeight: FontWeight.bold,
-        color: Colors.white,
-      ),
-      headlineMedium: TextStyle(
-        fontFamily: 'Cairo',
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-        color: Colors.white,
-      ),
-      titleLarge: TextStyle(
-        fontFamily: 'Cairo',
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
-        color: Colors.white,
-      ),
-      titleMedium: TextStyle(
-        fontFamily: 'Cairo',
-        fontSize: 16,
-        fontWeight: FontWeight.w500,
-        color: Colors.white,
-      ),
-      bodyLarge: TextStyle(
-        fontFamily: 'Cairo',
-        fontSize: 16,
-        fontWeight: FontWeight.normal,
-        color: Colors.white,
-      ),
-      bodyMedium: TextStyle(
-        fontFamily: 'Cairo',
-        fontSize: 14,
-        fontWeight: FontWeight.normal,
-        color: Colors.white,
-      ),
-      bodySmall: TextStyle(
-        fontFamily: 'Cairo',
-        fontSize: 12,
-        fontWeight: FontWeight.normal,
-        color: Colors.white70,
-      ),
-    ),
-    
-    // Button Theme
-    buttonTheme: const ButtonThemeData(
-      buttonColor: Color(0xFF8C10B8),
-      disabledColor: Colors.grey,
-      splashColor: Color(0xFF7000AB),
-      textTheme: ButtonTextTheme.primary,
-    ),
-    
-    // ElevatedButton Theme
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        foregroundColor: Colors.white,
-        backgroundColor: TColor.primary,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
-        elevation: 0,
-        textStyle: const TextStyle(
-          fontFamily: 'Cairo',
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-        ),
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-      ),
-    ),
-    
-    // Text Button Theme
-    textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(
-        foregroundColor: TColor.primary,
-        textStyle: const TextStyle(
-          fontFamily: 'Cairo',
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    ),
-    
-    // Input Decoration Theme
-    inputDecorationTheme: InputDecorationTheme(
-      filled: true,
-      fillColor: const Color(0xFF2A2A2A),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
-        borderSide: BorderSide.none,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
-        borderSide: BorderSide.none,
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
-        borderSide: BorderSide(color: TColor.primary, width: 1.5),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
-        borderSide: const BorderSide(color: Colors.red, width: 1.5),
-      ),
-      hintStyle: const TextStyle(
-        fontFamily: 'Cairo',
-        color: Colors.grey,
-        fontSize: 14,
-      ),
-      labelStyle: const TextStyle(
-        fontFamily: 'Cairo',
-        color: Colors.white70,
-        fontSize: 14,
-      ),
-    ),
-    
-    // Checkbox Theme
-    checkboxTheme: CheckboxThemeData(
-      fillColor: MaterialStateProperty.resolveWith<Color>((states) {
-        if (states.contains(MaterialState.selected)) {
-          return TColor.primary;
-        }
-        return Colors.transparent;
-      }),
-      side: const BorderSide(color: Colors.grey),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(4),
-      ),
-    ),
-    
-    // Card Theme
-    cardTheme: CardTheme(
-      color: const Color(0xFF2A2A2A),
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-    ),
-    
-    // Bottom Navigation Bar Theme
-    bottomNavigationBarTheme: BottomNavigationBarThemeData(
-      backgroundColor: const Color(0xFF1E1E1E),
-      selectedItemColor: TColor.primary,
-      unselectedItemColor: Colors.grey,
-      selectedLabelStyle: const TextStyle(
-        fontFamily: 'Cairo',
-        fontSize: 12,
-        fontWeight: FontWeight.w600,
-      ),
-      unselectedLabelStyle: const TextStyle(
-        fontFamily: 'Cairo',
-        fontSize: 12,
-        fontWeight: FontWeight.normal,
-      ),
-      type: BottomNavigationBarType.fixed,
-      elevation: 8,
-    ),
-    
-    colorScheme: ColorScheme.dark(
-      primary: TColor.primary,
-      secondary: TColor.secondary,
+    colorScheme: const ColorScheme.dark(
+      primary: AppColors.primary,
+      secondary: AppColors.secondary,
       surface: const Color(0xFF2A2A2A),
-      background: const Color(0xFF121212),
-      error: Colors.red,
-      onPrimary: Colors.white,
-      onSecondary: Colors.white,
-      onSurface: Colors.white,
-      onBackground: Colors.white,
-      onError: Colors.white,
-      brightness: Brightness.dark,
+      background: const Color(0xFF1A1A1A),
+      error: AppColors.error,
     ),
+    cardColor: const Color(0xFF2A2A2A),
+    shadowColor: Colors.black.withOpacity(0.2),
+    dividerColor: Colors.grey.shade800,
+    extensions: [
+      CustomColors.dark,
+    ],
   );
-} 
+}
+
+class CustomColors extends ThemeExtension<CustomColors> {
+  final Color cardHeaderBg;
+  final Color cardContentBg;
+  final Color textPrimary;
+  final Color textSecondary;
+  final Color timeContainerBg;
+  final Color timeContainerBorder;
+
+  CustomColors({
+    required this.cardHeaderBg,
+    required this.cardContentBg,
+    required this.textPrimary,
+    required this.textSecondary,
+    required this.timeContainerBg,
+    required this.timeContainerBorder,
+  });
+
+  static final light = CustomColors(
+    cardHeaderBg: AppColors.primary.withOpacity(0.04),
+    cardContentBg: Colors.white,
+    textPrimary: Colors.black87,
+    textSecondary: Colors.black54,
+    timeContainerBg: Colors.grey.shade50,
+    timeContainerBorder: Colors.grey.shade200,
+  );
+
+  static final dark = CustomColors(
+    cardHeaderBg: AppColors.primary.withOpacity(0.15),
+    cardContentBg: const Color(0xFF2A2A2A),
+    textPrimary: Colors.white,
+    textSecondary: Colors.white70,
+    timeContainerBg: const Color(0xFF353535),
+    timeContainerBorder: Colors.grey.shade800,
+  );
+
+  @override
+  ThemeExtension<CustomColors> copyWith({
+    Color? cardHeaderBg,
+    Color? cardContentBg,
+    Color? textPrimary,
+    Color? textSecondary,
+    Color? timeContainerBg,
+    Color? timeContainerBorder,
+  }) {
+    return CustomColors(
+      cardHeaderBg: cardHeaderBg ?? this.cardHeaderBg,
+      cardContentBg: cardContentBg ?? this.cardContentBg,
+      textPrimary: textPrimary ?? this.textPrimary,
+      textSecondary: textSecondary ?? this.textSecondary,
+      timeContainerBg: timeContainerBg ?? this.timeContainerBg,
+      timeContainerBorder: timeContainerBorder ?? this.timeContainerBorder,
+    );
+  }
+
+  @override
+  ThemeExtension<CustomColors> lerp(
+    ThemeExtension<CustomColors>? other,
+    double t,
+  ) {
+    if (other is! CustomColors) {
+      return this;
+    }
+    return CustomColors(
+      cardHeaderBg: Color.lerp(cardHeaderBg, other.cardHeaderBg, t)!,
+      cardContentBg: Color.lerp(cardContentBg, other.cardContentBg, t)!,
+      textPrimary: Color.lerp(textPrimary, other.textPrimary, t)!,
+      textSecondary: Color.lerp(textSecondary, other.textSecondary, t)!,
+      timeContainerBg: Color.lerp(timeContainerBg, other.timeContainerBg, t)!,
+      timeContainerBorder: Color.lerp(timeContainerBorder, other.timeContainerBorder, t)!,
+    );
+  }
+}

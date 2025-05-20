@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:healtho_gym/common/color_extension.dart';
 import 'package:healtho_gym/common_widget/day_exercises_row.dart';
-import 'package:healtho_gym/features/home/top_tab_view/workout_plan/workout_exercises_screen.dart';
+import 'package:healtho_gym/features/home/top_tab_view/exercises/workout_exercises_screen.dart';
 
 class DayExercisesScreen extends StatefulWidget {
   const DayExercisesScreen({super.key});

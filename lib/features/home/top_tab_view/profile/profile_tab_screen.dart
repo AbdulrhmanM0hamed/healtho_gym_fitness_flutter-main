@@ -60,6 +60,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const DashboardApp(),
+        fullscreenDialog: true,
       ),
     );
   }

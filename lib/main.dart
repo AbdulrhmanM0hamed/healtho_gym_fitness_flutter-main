@@ -5,11 +5,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:healtho_gym/firebase_options.dart';
 import 'package:healtho_gym/core/di/service_locator.dart';
 import 'package:healtho_gym/core/locale/app_localizations.dart';
-import 'package:healtho_gym/core/locale/locale_provider.dart';
 import 'package:healtho_gym/core/preferences/app_preferences.dart';
 import 'package:healtho_gym/core/routes/app_routes.dart';
 import 'package:healtho_gym/core/theme/app_theme.dart';
-import 'package:healtho_gym/core/theme/theme_provider.dart';
 import 'package:healtho_gym/dashboard/app/dashboard_app.dart';
 import 'package:healtho_gym/features/splash/splash_screen.dart';
 import 'package:provider/provider.dart';
@@ -29,29 +27,23 @@ void main() async {
 // Mobile application entry point
 void mainMobile() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // تهيئة Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  
+
   // تهيئة OneSignal
   _initOneSignal();
-  
+
   // Initialize Preferences
   await AppPreferences().init();
-  
+
   // Initialize ServiceLocator
   await ServiceLocator.init();
-  
+
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => ThemeProvider()..initialize()),
-        ChangeNotifierProvider(create: (_) => LocaleProvider()..initialize()),
-      ],
-      child: const MyApp(),
-    ),
+    const MyApp(),
   );
 }
 
@@ -59,10 +51,10 @@ void mainMobile() async {
 void _initOneSignal() {
   // إعداد مستوى السجل للتصحيح
   OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
-  
+
   // تهيئة OneSignal بمعرف التطبيق
   OneSignal.initialize("897f8d3f-91cb-4fd1-b5f9-570e9c73cfe6");
-  
+
   // طلب إذن الإشعارات
   try {
     OneSignal.Notifications.requestPermission(true);
@@ -70,16 +62,17 @@ void _initOneSignal() {
     print("خطأ في طلب أذونات الإشعارات: $e");
     // استمر رغم الخطأ
   }
-  
+
   // إعداد معالج النقر على الإشعارات
   try {
     OneSignal.Notifications.addClickListener((event) {
-      print("تم النقر على إشعار OneSignal: ${event.notification.additionalData}");
+      print(
+          "تم النقر على إشعار OneSignal: ${event.notification.additionalData}");
     });
   } catch (e) {
     print("خطأ في إضافة مستمع النقر على الإشعارات: $e");
   }
-  
+
   // إضافة تأخير قبل تهيئة خدمة الإشعارات المخصصة
   // للسماح لـ OneSignal بالتسجيل أولاً
   Future.delayed(const Duration(seconds: 3), () {
@@ -92,18 +85,18 @@ void _initOneSignal() {
 // Dashboard application entry point
 void mainDashboard() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // تهيئة Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  
+
   // Initialize ServiceLocator
   await ServiceLocator.init();
-  
+
   // This would be a better approach but requires importing the dashboard directly
   // runApp(const DashboardApp());
-  
+
   // Instead, for now, show a message telling the user to use dashboard_main.dart
   runApp(DashboardApp());
 }
@@ -113,16 +106,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final localeProvider = Provider.of<LocaleProvider>(context);
-    
     return MaterialApp(
       title: 'Healtho Gym',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: themeProvider.themeMode,
-      locale: localeProvider.locale,
+
+      locale: Locale('ar'),
       supportedLocales: const [
         Locale('ar'),
         Locale('en'),
