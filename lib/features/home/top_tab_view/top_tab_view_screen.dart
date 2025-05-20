@@ -123,7 +123,7 @@ class _TopTabViewScreenState extends State<TopTabViewScreen> with TickerProvider
     try {
       // محاولة الاتصال بالخادم
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:3000/'),
+        Uri.parse('https://notification-server-production-befa.up.railway.app/'),
       ).timeout(const Duration(seconds: 2));
       
       return response.statusCode == 200;

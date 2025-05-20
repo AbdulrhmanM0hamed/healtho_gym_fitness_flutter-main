@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -20,6 +20,10 @@ class OneSignalNotificationService {
   
   // حالة وجود عمود onesignal_id في قاعدة البيانات
   bool _hasOneSignalIdColumn = false;
+  
+  // URL الخاص بخادم الإشعارات المنشور
+  // تحتاج لتغيير هذا الرابط إلى رابط الخادم المنشور الخاص بك
+  final String _notificationServerUrl = 'https://notification-server-production-befa.up.railway.app';
   
   factory OneSignalNotificationService() {
     return _instance;
@@ -147,14 +151,18 @@ class OneSignalNotificationService {
         },
       );
       
-      // إنشاء قناة الإشعارات
-      final androidChannel = AndroidNotificationChannel(
+      // إنشاء قناة الإشعارات عالية الأهمية
+  const   androidChannel =   AndroidNotificationChannel(
         'health_tips_channel',
         'Health Tips',
         description: 'Notifications for new health tips',
-        importance: Importance.high,
+        importance: Importance.max, // تغيير من high إلى max
         playSound: true,
-        sound: const RawResourceAndroidNotificationSound('notification'),
+        enableVibration: true,
+        enableLights: true,
+        showBadge: true,
+        // استخدام الصوت الافتراضي للنظام
+        sound: null, // تم تعيينه كـ null لاستخدام الصوت الافتراضي
       );
       
       await _localNotifications
@@ -255,23 +263,34 @@ class OneSignalNotificationService {
     try {
       _logger.i('عرض إشعار محلي: ${tip.title}');
       
+      // تعزيز إعدادات الإشعارات المحلية
       const androidDetails = AndroidNotificationDetails(
         'health_tips_channel',
         'Health Tips',
         channelDescription: 'Notifications for new health tips',
-        importance: Importance.high,
-        priority: Priority.high,
-        sound: RawResourceAndroidNotificationSound('notification'),
+        importance: Importance.max, 
+        priority: Priority.max, 
         playSound: true,
         enableVibration: true,
         enableLights: true,
+        colorized: true,
+        color: Color(0xFF03A9F4), // لون الإشعار
+        largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
+        category: AndroidNotificationCategory.message,
+        visibility: NotificationVisibility.public,
+        // استخدام الصوت الافتراضي للنظام
+        sound: null, // تم تعيينه كـ null لاستخدام الصوت الافتراضي
       );
       
       const iosDetails = DarwinNotificationDetails(
         presentAlert: true,
         presentBadge: true,
         presentSound: true,
-        sound: 'notification.m4a',
+        // استخدام الصوت الافتراضي للنظام
+        sound: null, // تم تعيينه كـ null لاستخدام الصوت الافتراضي
+        badgeNumber: 1,
+        interruptionLevel: InterruptionLevel.active,
+        categoryIdentifier: 'health_tips_category',
       );
       
       const notificationDetails = NotificationDetails(
@@ -325,8 +344,17 @@ class OneSignalNotificationService {
       // إرسال إشعار لجميع الأجهزة
       await _sendTestPushNotification(title, body);
       
-      // عرض معلومات حول كيفية إرسال إشعارات للأجهزة الأخرى
-      _showNotificationInstructions();
+      // محاولة إرسال إشعار عبر الخادم أيضًا
+      try {
+        final success = await sendNotificationViaServer(title, body);
+        if (success) {
+          _logger.i('✅ تم إرسال الإشعار عبر الخادم بنجاح');
+        } else {
+          _logger.w('⚠️ فشل إرسال الإشعار عبر الخادم');
+        }
+      } catch (serverError) {
+        _logger.e('❌ خطأ في إرسال الإشعار عبر الخادم: $serverError');
+      }
       
     } catch (e) {
       _logger.e('❌ خطأ في اختبار الإشعار: $e', error: e);
@@ -361,9 +389,6 @@ class OneSignalNotificationService {
       _logger.i('محاولة إرسال إشعار إلى جميع المشتركين...');
       
       try {
-        // محاولة إرسال باستخدام واجهة REST API (تتطلب مفتاح REST API)
-        _logger.i('محاولة إرسال عبر إضافة وسم للتتبع وتحديث لوحة OneSignal...');
-        
         // إضافة وسم يمكن استخدامه للاستهداف في لوحة OneSignal
         await OneSignal.User.addTagWithKey('test_group', 'all_users');
         _logger.i('✅ تم إضافة وسم test_group للمستخدم');
@@ -371,14 +396,10 @@ class OneSignalNotificationService {
         // وسوم أخرى مفيدة للتتبع
         await OneSignal.User.addTagWithKey('device_id', pushSubscription.id ?? '');
         await OneSignal.User.addTagWithKey('last_test', DateTime.now().toString());
+        await OneSignal.User.addTagWithKey('notification_enabled', 'true');
         
         _logger.i('لإرسال إشعار للجميع، يرجى استخدام لوحة تحكم OneSignal واستهداف المستخدمين ذوي الوسم test_group=all_users');
         _logger.i('يمكن استهداف هذا الجهاز فقط عبر device_id=${pushSubscription.id ?? "unknown"}');
-        
-        // لا يمكن إرسال إشعارات للجميع مباشرة من التطبيق دون مفتاح REST API
-        // يمكن استخدام Firebase Cloud Functions أو backend للقيام بذلك
-        
-        _logger.i('✅ تم إضافة الوسوم بنجاح، ويمكن للمشرفين إرسال إشعارات عبر لوحة التحكم');
         
       } catch (taggingError) {
         _logger.e('❌ خطأ في إضافة الوسوم: $taggingError', error: taggingError);
@@ -469,30 +490,80 @@ class OneSignalNotificationService {
     try {
       _logger.i('▶️ محاولة إرسال إشعار لجميع الأجهزة عبر الخادم...');
       
-      // تحتاج إلى إضافة مكتبة http إذا لم تكن موجودة
-      // في ملف pubspec.yaml: http: ^1.1.0
-      final response = await http.post(
-        Uri.parse('http://10.0.2.2:3000/send-notification'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'title': title,
-          'message': body,
-          'data': {
-            'type': 'test',
-            'timestamp': DateTime.now().toString(),
-          }
-        }),
-      );
-      
-      if (response.statusCode == 200) {
-        _logger.i('✅ تم إرسال الإشعار بنجاح إلى الخادم');
-        return true;
-      } else {
-        _logger.e('❌ فشل إرسال الإشعار: ${response.body}');
-        return false;
+      final client = http.Client();
+      try {
+        // استخدام مهلة أطول (10 ثوانٍ)
+        final response = await client.post(
+          Uri.parse('$_notificationServerUrl/send-notification'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'title': title,
+            'message': body,
+            'data': {
+              'type': 'test',
+              'timestamp': DateTime.now().toString(),
+              'app': 'Healtho Gym',
+              'highPriority': true
+            }
+          }),
+        ).timeout(const Duration(seconds: 10));
+        
+        _logger.i('استجابة الخادم: ${response.statusCode} - ${response.body}');
+        
+        if (response.statusCode == 200) {
+          _logger.i('✅ تم إرسال الإشعار بنجاح إلى الخادم');
+          return true;
+        } else {
+          _logger.e('❌ فشل إرسال الإشعار: ${response.body}');
+          return false;
+        }
+      } finally {
+        client.close();
       }
     } catch (e) {
       _logger.e('❌ خطأ في إرسال الإشعار عبر الخادم: $e', error: e);
+      return false;
+    }
+  }
+  
+  // إرسال إشعار لمستخدمين محددين
+  Future<bool> sendNotificationToUsers(String title, String body, List<String> userIds) async {
+    try {
+      _logger.i('▶️ محاولة إرسال إشعار لمستخدمين محددين عبر الخادم...');
+      
+      final client = http.Client();
+      try {
+        // استخدام مهلة أطول (10 ثوانٍ)
+        final response = await client.post(
+          Uri.parse('$_notificationServerUrl/send-notification-to-users'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'title': title,
+            'message': body,
+            'userIds': userIds,
+            'data': {
+              'type': 'target',
+              'timestamp': DateTime.now().toString(),
+              'app': 'Healtho Gym',
+              'highPriority': true
+            }
+          }),
+        ).timeout(const Duration(seconds: 10));
+        
+        _logger.i('استجابة الخادم: ${response.statusCode} - ${response.body}');
+        
+        if (response.statusCode == 200) {
+          _logger.i('✅ تم إرسال الإشعار بنجاح للمستخدمين المحددين');
+          return true;
+        } else {
+          _logger.e('❌ فشل إرسال الإشعار للمستخدمين المحددين: ${response.body}');
+          return false;
+        }
+      } finally {
+        client.close();
+      }
+    } catch (e) {
+      _logger.e('❌ خطأ في إرسال الإشعار للمستخدمين المحددين: $e', error: e);
       return false;
     }
   }

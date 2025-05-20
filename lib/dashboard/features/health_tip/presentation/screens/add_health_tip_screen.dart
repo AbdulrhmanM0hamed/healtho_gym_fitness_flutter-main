@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:healtho_gym/common/color_extension.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../data/models/health_tip_model.dart';
 import '../viewmodels/health_tip_cubit.dart';
 import '../viewmodels/health_tip_state.dart';
 
