@@ -3,7 +3,6 @@ import 'package:healtho_gym/common/color_extension.dart';
 import 'package:healtho_gym/features/home/top_tab_view/exercises/data/models/exercise_category_model.dart';
 import 'package:healtho_gym/features/home/top_tab_view/exercises/presentation/widgets/exercises_category_card.dart';
 import 'package:healtho_gym/features/home/top_tab_view/exercises/exercises_name_screen.dart';
-import 'package:healtho_gym/features/home/top_tab_view/workout_plan/workout_detail_screen.dart';
 
 class ChallengesScreen extends StatefulWidget {
   const ChallengesScreen({super.key});
@@ -73,7 +72,7 @@ class _ChallengesScreenState extends State<ChallengesScreen> {
   return ExercisesCategoryCard(
     category: obj,
     onPressed: () {
-      context.push(const WorkoutDetailScreen());
+    //  context.push(const WorkoutDetailScreen());
     },
   );
 },

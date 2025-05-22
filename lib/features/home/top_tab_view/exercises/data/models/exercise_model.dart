@@ -26,6 +26,42 @@ class Exercise extends Equatable {
   });
 
   factory Exercise.fromJson(Map<String, dynamic> json) {
+    // Parse imageUrl which can come as a string or a list
+    List<String> parseImageUrl(dynamic imageUrlData) {
+      if (imageUrlData == null) return [];
+      
+      // If it's already a List<dynamic>, convert it to List<String>
+      if (imageUrlData is List) {
+        return imageUrlData.map((item) => item.toString()).toList();
+      }
+      
+      // If it's a String, try to parse it
+      if (imageUrlData is String) {
+        try {
+          // If empty, return empty list
+          if (imageUrlData.isEmpty) return [];
+          
+          // Remove all backslashes, brackets, and quotes, then split by comma
+          final cleanString = imageUrlData
+              .replaceAll('\\', '')
+              .replaceAll('[', '')
+              .replaceAll(']', '')
+              .replaceAll('"', '')
+              .trim();
+              
+          return cleanString.split(',')
+              .map((url) => url.trim())
+              .where((url) => url.isNotEmpty)
+              .toList();
+        } catch (e) {
+          print('Error parsing image URLs: $e');
+          return [];
+        }
+      }
+      
+      return [];
+    }
+
     return Exercise(
       id: json['id'],
       categoryId: json['category_id'],
@@ -36,7 +72,7 @@ class Exercise extends Equatable {
       isFavorite: json['is_favorite'],
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
-      imageUrl: json['image_url'],
+      imageUrl: parseImageUrl(json['image_url']),
     );
   }
 

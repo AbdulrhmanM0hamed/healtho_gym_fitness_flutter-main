@@ -65,25 +65,27 @@ class ExercisesCard extends StatelessWidget {
                 const Spacer(),
                 InkWell(
                   onTap: onToggleFavorite,
-                  child: SizedBox(
+                  child: Container(
                     width: 40,
-                    child: Image.asset(
-                      isFavorite
-                        ? "assets/img/fav_red.png"
-                        : "assets/img/fav_white.png",
-                      width: 25,
-                      height: 25,
+                    height: 40,
+                    alignment: Alignment.center,
+                    child: Icon(
+                      isFavorite ? Icons.favorite : Icons.favorite_border,
+                      color: isFavorite ? Colors.red : Colors.white,
+                      size: 25,
                     ),
                   ),
                 ),
                 InkWell(
                   onTap: () {},
-                  child: SizedBox(
+                  child: Container(
                     width: 40,
-                    child: Image.asset(
-                      "assets/img/share_white.png",
-                      width: 25,
-                      height: 25,
+                    height: 40,
+                    alignment: Alignment.center,
+                    child: const Icon(
+                      Icons.share,
+                      color: Colors.white,
+                      size: 25,
                     ),
                   ),
                 ),
@@ -98,6 +100,15 @@ class ExercisesCard extends StatelessWidget {
   }
   
   Widget _buildImage(String imagePath) {
+    // Safety check for empty path
+    if (imagePath.isEmpty) {
+      return Container(
+        color: Colors.grey[300],
+        alignment: Alignment.center,
+        child: const Icon(Icons.image_not_supported, size: 40),
+      );
+    }
+    
     // Check if the image path is a network URL or local asset
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
       // It's a network image
@@ -111,25 +122,40 @@ class ExercisesCard extends StatelessWidget {
             color: TColor.primary,
           ),
         ),
-        errorWidget: (context, url, error) => Container(
-          color: Colors.grey[300],
-          alignment: Alignment.center,
-          child: const Icon(Icons.image_not_supported, size: 40),
-        ),
+        errorWidget: (context, url, error) {
+          print('DEBUG: Error loading image in card: $url, Error: $error');
+          return Container(
+            color: Colors.grey[300],
+            alignment: Alignment.center,
+            child: const Icon(Icons.image_not_supported, size: 40),
+          );
+        },
       );
     } else {
       // It's a local asset
-      return Image.asset(
-        imagePath,
-        width: double.maxFinite,
-        height: double.maxFinite,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => Container(
+      try {
+        return Image.asset(
+          imagePath,
+          width: double.maxFinite,
+          height: double.maxFinite,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            print('DEBUG: Error loading local image: $imagePath, Error: $error');
+            return Container(
+              color: Colors.grey[300],
+              alignment: Alignment.center,
+              child: const Icon(Icons.image_not_supported, size: 40),
+            );
+          },
+        );
+      } catch (e) {
+        print('DEBUG: Exception loading image: $e');
+        return Container(
           color: Colors.grey[300],
           alignment: Alignment.center,
           child: const Icon(Icons.image_not_supported, size: 40),
-        ),
-      );
+        );
+      }
     }
   }
 }

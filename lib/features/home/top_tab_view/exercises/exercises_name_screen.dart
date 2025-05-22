@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:healtho_gym/common/color_extension.dart';
+import 'package:healtho_gym/common/custom_app_bar.dart';
 import 'package:healtho_gym/features/home/top_tab_view/exercises/presentation/widgets/exercises_card.dart';
 import 'package:healtho_gym/features/home/top_tab_view/exercises/presentation/cubits/exercises_cubit.dart';
 import 'package:healtho_gym/features/home/top_tab_view/exercises/workout_exercises_screen.dart';
@@ -28,25 +29,13 @@ class _ExercisesNameScreenState extends State<ExercisesNameScreen> {
         bloc: _exercisesCubit,
         builder: (context, state) {
           return Scaffold(
-            appBar: AppBar(
-              automaticallyImplyLeading: false,
+            appBar: CustomAppBar(
               backgroundColor: TColor.secondary,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
               centerTitle: false,
-              title: Text(
-                state is ExercisesLoaded && state.category != null
-                    ? state.category!.titleAr
-                    : 'تمارين',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                ),
-              ),
+              title: state is ExercisesLoaded && state.category != null
+                  ? state.category!.titleAr
+                  : 'تمارين',
+              titleColor: Colors.white,
             ),
             body: Column(
               children: [
@@ -144,7 +133,14 @@ class _ExercisesNameScreenState extends State<ExercisesNameScreen> {
                                                 context,
                                                 MaterialPageRoute(
                                                     builder: (context) =>
-                                                        const WorkoutExercisesDetailScreen()));
+                                                        WorkoutExercisesDetailScreen(
+                                                          exercise: exercise,
+                                                          onToggleFavorite: () {
+                                                            _exercisesCubit
+                                                                .toggleFavorite(
+                                                                    exercise);
+                                                          },
+                                                        )));
                                           },
                                           onToggleFavorite: () {
                                             _exercisesCubit

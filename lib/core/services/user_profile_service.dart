@@ -1,7 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:healtho_gym/core/services/supabase_service.dart';
 import 'package:healtho_gym/features/login/data/models/user_profile_model.dart';
-import 'package:healtho_gym/core/constants/db_constants.dart';
+import 'package:healtho_gym/core/constant/db_constants.dart';
 import 'package:healtho_gym/core/utils/logger_util.dart';
 import 'dart:async';
 import 'dart:typed_data';

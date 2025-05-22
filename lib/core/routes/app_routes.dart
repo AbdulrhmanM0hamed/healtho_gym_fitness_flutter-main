@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:healtho_gym/features/home/top_tab_view/top_tab_view_screen.dart';
+import 'package:healtho_gym/features/home/top_tab_view_screen.dart';
 import 'package:healtho_gym/features/onboarding/onboarding_screen.dart';
 import 'package:healtho_gym/features/login/presentation/view/screens/sign_in_screen.dart';
 import 'package:healtho_gym/features/login/presentation/view/screens/sign_up_screen.dart';

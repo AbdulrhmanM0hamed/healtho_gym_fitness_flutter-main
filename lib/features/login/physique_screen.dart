@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:healtho_gym/common/color_extension.dart';
 import 'package:healtho_gym/common_widget/round_button.dart';
 import 'package:healtho_gym/common_widget/round_title_value_button.dart';
-import 'package:healtho_gym/features/home/top_tab_view/top_tab_view_screen.dart';
+import 'package:healtho_gym/features/home/top_tab_view_screen.dart';
 import 'package:healtho_gym/features/login/select_age_screen.dart';
 import 'package:healtho_gym/features/login/select_height_screen.dart';
 import 'package:healtho_gym/features/login/select_level_screen.dart';

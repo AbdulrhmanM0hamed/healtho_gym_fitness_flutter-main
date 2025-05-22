@@ -10,7 +10,7 @@ import 'package:healtho_gym/features/home/top_tab_view/exercises/exercises_tab_s
 import 'package:healtho_gym/features/home/top_tab_view/health_tip/presentation/views/health_tip_screen.dart';
 import 'package:healtho_gym/features/home/top_tab_view/profile/profile_tab_screen.dart';
 import 'package:healtho_gym/features/home/top_tab_view/trainer/trainer_tab_screen.dart';
-import 'package:healtho_gym/features/home/top_tab_view/workout_plan/workout_plan_screen.dart';
+import 'package:healtho_gym/features/home/top_tab_view/workout_plan/presentation/screens/workout_plan_screen.dart';
 import 'package:healtho_gym/features/login/presentation/viewmodels/auth_cubit/auth_cubit.dart';
 import 'package:healtho_gym/features/login/presentation/viewmodels/user_profile_cubit/profile_cubit.dart';
 import 'package:healtho_gym/core/services/one_signal_notification_service.dart';
@@ -50,13 +50,13 @@ class _TopTabViewScreenState extends State<TopTabViewScreen> with TickerProvider
   late OneSignalNotificationService _notificationService;
 
   // Create all screens once
-  final List<Widget> _screens = const [
-    HealthTipScreen(),
-    ExercisesScreen(),
-    WorkoutPlanScreen(),
-    ChallengesScreen(),
-    TrainerTabScreen(),
-    ProfileTabScreen(),
+  final List<Widget> _screens = [
+    const HealthTipScreen(),
+    const ExercisesScreen(),
+    const WorkoutPlanScreen(),
+    const ChallengesScreen(),
+    const TrainerTabScreen(),
+    const ProfileTabScreen(),
   ];
 
   @override

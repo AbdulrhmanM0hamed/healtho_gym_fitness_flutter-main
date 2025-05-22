@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:healtho_gym/dashboard/features/exercise/data/repositories/exercise_repository.dart' as dashboard_exercise;
 import 'package:healtho_gym/dashboard/features/exercise/presentation/viewmodels/exercise_cubit.dart';
 import 'package:healtho_gym/dashboard/features/exercise_category/data/repositories/exercise_category_repository.dart';
@@ -22,6 +23,10 @@ import 'package:healtho_gym/features/home/top_tab_view/health_tip/presentation/v
 import 'package:healtho_gym/dashboard/features/health_tip/presentation/viewmodels/health_tip_cubit.dart' as dashboard;
 import 'package:healtho_gym/core/services/one_signal_notification_service.dart';
 import 'package:healtho_gym/core/services/storage_service.dart';
+import 'package:healtho_gym/features/home/top_tab_view/workout_plan/data/datasources/workout_plan_remote_data_source.dart';
+import 'package:healtho_gym/features/home/top_tab_view/workout_plan/data/repositories/workout_plan_repository.dart';
+import 'package:healtho_gym/features/home/top_tab_view/workout_plan/data/repositories/filters_repository.dart';
+import 'package:healtho_gym/features/home/top_tab_view/workout_plan/presentation/viewmodels/workout_plan_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -50,6 +55,16 @@ class ServiceLocator {
     // Dashboard repositories
     sl.registerLazySingleton<ExerciseCategoryRepository>(() => ExerciseCategoryRepository());
     sl.registerLazySingleton<dashboard_exercise.ExerciseRepository>(() => dashboard_exercise.ExerciseRepository());
+
+    // Workout Plan dependencies
+    sl.registerLazySingleton<WorkoutPlanRemoteDataSource>(
+      () => WorkoutPlanRemoteDataSource(Supabase.instance.client),
+    );
+    sl.registerLazySingleton(() => WorkoutPlanRepository(sl<WorkoutPlanRemoteDataSource>()));
+    sl.registerLazySingleton(() => FiltersRepository(sl<SupabaseClient>()));
+    sl.registerFactory<WorkoutPlanCubit>(
+      () => WorkoutPlanCubit(sl()),
+    );
 
     // Register cubits
     sl.registerFactory<AuthCubit>(() => AuthCubit());

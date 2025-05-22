@@ -1,4 +1,4 @@
-import 'package:healtho_gym/core/constants/db_constants.dart';
+import 'package:healtho_gym/core/constant/db_constants.dart';
 import 'package:healtho_gym/core/services/supabase_service.dart';
 import 'package:healtho_gym/core/utils/logger_util.dart';
 import 'package:healtho_gym/dashboard/features/user/data/models/user_with_profile.dart';

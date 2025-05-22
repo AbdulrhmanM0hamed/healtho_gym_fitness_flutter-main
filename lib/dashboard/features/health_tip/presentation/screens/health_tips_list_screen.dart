@@ -367,7 +367,10 @@ class HealthTipsListScreen extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const AddHealthTipScreen(),
+        builder: (context) => BlocProvider(
+          create: (context) => sl<HealthTipCubit>(),
+          child: const AddHealthTipScreen(),
+        ),
       ),
     ).then((value) {
       if (value == true) {
@@ -386,7 +389,10 @@ class HealthTipsListScreen extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditHealthTipScreen(tipId: tip.id),
+        builder: (context) => BlocProvider(
+          create: (context) => sl<HealthTipCubit>(),
+          child: EditHealthTipScreen(tipId: tip.id),
+        ),
       ),
     ).then((value) {
       if (value == true) {
