@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:healtho_gym/common/color_extension.dart';
-import 'package:healtho_gym/common_widget/number_title_subtitle_button.dart';
 import 'package:healtho_gym/core/di/service_locator.dart';
 import 'package:healtho_gym/features/home/top_tab_view/workout_plan/presentation/screens/week_detail_screen.dart';
 import 'package:healtho_gym/features/home/top_tab_view/workout_plan/presentation/screens/workout_introductions_screen.dart';
 import 'package:healtho_gym/features/home/top_tab_view/workout_plan/presentation/viewmodels/workout_plan_cubit.dart';
-import 'package:healtho_gym/features/home/top_tab_view/workout_plan/presentation/widgets/common/info_chip.dart';
 import 'package:healtho_gym/features/home/top_tab_view/workout_plan/presentation/widgets/week/week_detail_item.dart';
 
 class WorkoutDetailScreen extends StatefulWidget {

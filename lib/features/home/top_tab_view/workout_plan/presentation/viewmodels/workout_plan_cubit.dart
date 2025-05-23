@@ -82,7 +82,19 @@ class WorkoutPlanCubit extends Cubit<WorkoutPlanState> {
     try {
       emit(WorkoutPlanLoading());
       
-      final durationWeeks = duration != null ? int.tryParse(duration.split(' ')[0]) : null;
+      // Parse duration correctly
+      int? durationWeeks;
+      if (duration != null) {
+        // Extract number from string like "4 Weeks"
+        final regex = RegExp(r'(\d+)');
+        final match = regex.firstMatch(duration);
+        if (match != null) {
+          durationWeeks = int.tryParse(match.group(1) ?? '');
+          print('Parsed duration: $duration to $durationWeeks weeks');
+        }
+      }
+      
+      print('Applying filters - Category ID: $categoryId, Level: $level, Duration: $durationWeeks weeks');
       
       final plans = await _repository.getWorkoutPlans(
         limit: _pageSize,
@@ -93,6 +105,8 @@ class WorkoutPlanCubit extends Cubit<WorkoutPlanState> {
         categoryId: categoryId,
         exerciseId: exerciseId,
       );
+      
+      print('Filtered plans count: ${plans.length}');
       
       final totalCount = await _repository.getWorkoutPlansCount();
       

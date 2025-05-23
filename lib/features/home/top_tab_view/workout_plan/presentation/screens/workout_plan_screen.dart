@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:healtho_gym/common/color_extension.dart';
 import 'package:healtho_gym/common_widget/round_button.dart';
 import 'package:healtho_gym/core/di/service_locator.dart';
 import 'package:healtho_gym/features/home/top_tab_view/workout_plan/data/repositories/filters_repository.dart';
@@ -17,12 +16,14 @@ class WorkoutPlanScreen extends StatefulWidget {
 }
 
 class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
+  late WorkoutPlanCubit _workoutPlanCubit;
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   
   // Filter variables
   String selectedCategory = 'All';
   String selectedLevel = 'All';
   String selectedDuration = 'All';
+  bool isFilterApplied = false;
 
   // Filter data
   List<String> categories = ['All'];
@@ -33,6 +34,8 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
   @override
   void initState() {
     super.initState();
+    _workoutPlanCubit = sl<WorkoutPlanCubit>();
+    _workoutPlanCubit.getWorkoutPlans();
     _loadFilterData();
   }
   
@@ -62,6 +65,12 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
         levels = levelsList;
         durations = durationsList;
       });
+      
+      // Debug print to verify data
+      print('Categories loaded: $categoryList');
+      print('Category IDs: $categoryIdMap');
+      print('Levels loaded: $levelsList');
+      print('Durations loaded: $durationsList');
     } catch (e) {
       // Use default values in case of error
       print('Error loading filter data: $e');
@@ -69,33 +78,42 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
   }
   
   Future<void> _refreshPlans() async {
-    context.read<WorkoutPlanCubit>().getWorkoutPlans();
+    _workoutPlanCubit.getWorkoutPlans();
   }
   
   void _applyFilters() {
-    final cubit = context.read<WorkoutPlanCubit>();
-    
     int? categoryId;
     if (selectedCategory != 'All') {
       categoryId = categoryIds[selectedCategory];
+      print('Filtering by category: $selectedCategory (ID: $categoryId)');
     }
     
     String? levelFilter;
     if (selectedLevel != 'All') {
       levelFilter = selectedLevel;
+      print('Filtering by level: $levelFilter');
     }
     
-    cubit.filterPlans(
+    String? durationFilter = selectedDuration == 'All' ? null : selectedDuration;
+    if (durationFilter != null) {
+      print('Filtering by duration: $durationFilter');
+    }
+    
+    setState(() {
+      isFilterApplied = true;
+    });
+    
+    _workoutPlanCubit.filterPlans(
       categoryId: categoryId,
       level: levelFilter,
-      duration: selectedDuration == 'All' ? null : selectedDuration,
+      duration: durationFilter,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => sl<WorkoutPlanCubit>()..getWorkoutPlans(),
+    return BlocProvider.value(
+      value: _workoutPlanCubit,
       child: Scaffold(
         body: Column(
           children: [
@@ -109,6 +127,7 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
               durations: durations,
               onCategoryChanged: (String? newValue) {
                 if (newValue != null) {
+                  print('Category changed to: $newValue');
                   setState(() {
                     selectedCategory = newValue;
                   });
@@ -117,6 +136,7 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
               },
               onLevelChanged: (String? newValue) {
                 if (newValue != null) {
+                  print('Level changed to: $newValue');
                   setState(() {
                     selectedLevel = newValue;
                   });
@@ -125,6 +145,7 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
               },
               onDurationChanged: (String? newValue) {
                 if (newValue != null) {
+                  print('Duration changed to: $newValue');
                   setState(() {
                     selectedDuration = newValue;
                   });
@@ -158,8 +179,10 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
                                   selectedCategory = 'All';
                                   selectedLevel = 'All';
                                   selectedDuration = 'All';
+                                  isFilterApplied = false;
                                 });
                                 _refreshPlans();
+                                print('Filters reset to default');
                               },
                             ),
                           ],
