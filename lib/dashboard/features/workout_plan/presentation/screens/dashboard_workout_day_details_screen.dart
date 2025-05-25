@@ -25,14 +25,43 @@ class DashboardWorkoutDayDetailsScreen extends StatefulWidget {
 }
 
 class _DashboardWorkoutDayDetailsScreenState extends State<DashboardWorkoutDayDetailsScreen> {
+  bool _isInitialLoadDone = false;
+  List<DashboardDayExerciseModel> _exercises = [];
+  bool _isLoading = true;
+  String? _errorMessage;
+  
   @override
   void initState() {
     super.initState();
-    _loadExercises();
+    // Delay initial load slightly to avoid build issues
+    Future.microtask(_loadExercises);
   }
 
-  void _loadExercises() {
-    context.read<DashboardWorkoutPlanCubit>().getExercisesForDay(widget.dayId);
+  Future<void> _loadExercises() async {
+    if (!mounted) return;
+    
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+    
+    try {
+      final cubit = context.read<DashboardWorkoutPlanCubit>();
+      await cubit.getExercisesForDay(widget.dayId);
+      _isInitialLoadDone = true;
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'فشل في تحميل التمارين: $e';
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -44,11 +73,13 @@ class _DashboardWorkoutDayDetailsScreenState extends State<DashboardWorkoutDayDe
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          _loadExercises();
+          await _loadExercises();
         },
-        child: BlocConsumer<DashboardWorkoutPlanCubit, DashboardWorkoutPlanState>(
+        child: BlocListener<DashboardWorkoutPlanCubit, DashboardWorkoutPlanState>(
           listener: (context, state) {
+            // Handle state changes
             if (state is DashboardWorkoutPlanActionSuccess) {
+              // Show success message
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(state.message)),
               );
@@ -58,62 +89,39 @@ class _DashboardWorkoutDayDetailsScreenState extends State<DashboardWorkoutDayDe
                 _loadExercises();
               }
             }
-          },
-          builder: (context, state) {
-            // First check if we have exercises data to display
+            
+            // Update local state based on bloc state
             if (state is DashboardDayExercisesLoaded && state.dayId == widget.dayId) {
-              return _buildExercisesList(context, state.exercises);
+              setState(() {
+                _exercises = state.exercises;
+                _isLoading = false;
+                _errorMessage = null;
+                _isInitialLoadDone = true;
+              });
+            } else if (state is DashboardWorkoutPlanError) {
+              setState(() {
+                _errorMessage = state.message;
+                _isLoading = false;
+              });
+            }
+          },
+          child: Builder(builder: (context) {
+            // Show loading state
+            if (_isLoading && !_isInitialLoadDone) {
+              return const Center(child: LoadingIndicator());
             }
             
-            // Check for loading state
-            if (state is DashboardWorkoutPlanLoading) {
-              return const Center(child: LoadingIndicator());
-            } 
-            
-            // Check for error state
-            else if (state is DashboardWorkoutPlanError) {
+            // Show error state
+            if (_errorMessage != null) {
               return ErrorView(
-                message: state.message,
+                message: _errorMessage!,
                 onRetry: _loadExercises,
               );
-            } 
-            
-            // Check for success action state
-            else if (state is DashboardWorkoutPlanActionSuccess) {
-              // Automatically reload data after a short delay
-              Future.delayed(const Duration(milliseconds: 300), () {
-                if (mounted) {
-                  _loadExercises();
-                }
-              });
-              
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(state.message),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: _loadExercises,
-                      child: const Text('تحديث البيانات'),
-                    ),
-                  ],
-                ),
-              );
-            } 
-            
-            // Fallback - show loading instead of "choose a day"
-            else {
-              // Try to load exercises again
-              Future.delayed(const Duration(milliseconds: 100), () {
-                if (mounted) {
-                  _loadExercises();
-                }
-              });
-              
-              return const Center(child: LoadingIndicator());
             }
-          },
+            
+            // Show exercises list or empty state
+            return _buildExercisesList(context, _exercises);
+          }),
         ),
       ),
       floatingActionButton: FloatingActionButton(

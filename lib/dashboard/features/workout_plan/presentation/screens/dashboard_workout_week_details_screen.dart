@@ -26,14 +26,43 @@ class DashboardWorkoutWeekDetailsScreen extends StatefulWidget {
 }
 
 class _DashboardWorkoutWeekDetailsScreenState extends State<DashboardWorkoutWeekDetailsScreen> {
+  bool _isInitialLoadDone = false;
+  List<DashboardWorkoutDayModel> _days = [];
+  bool _isLoading = true;
+  String? _errorMessage;
+  
   @override
   void initState() {
     super.initState();
-    _loadDays();
+    // Delay initial load slightly to avoid build issues
+    Future.microtask(_loadDays);
   }
 
-  void _loadDays() {
-    context.read<DashboardWorkoutPlanCubit>().getDaysForWeek(widget.weekId);
+  Future<void> _loadDays() async {
+    if (!mounted) return;
+    
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+    
+    try {
+      final cubit = context.read<DashboardWorkoutPlanCubit>();
+      await cubit.getDaysForWeek(widget.weekId);
+      _isInitialLoadDone = true;
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'فشل في تحميل الأيام: $e';
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -45,11 +74,13 @@ class _DashboardWorkoutWeekDetailsScreenState extends State<DashboardWorkoutWeek
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          _loadDays();
+          await _loadDays();
         },
-        child: BlocConsumer<DashboardWorkoutPlanCubit, DashboardWorkoutPlanState>(
+        child: BlocListener<DashboardWorkoutPlanCubit, DashboardWorkoutPlanState>(
           listener: (context, state) {
+            // Handle state changes
             if (state is DashboardWorkoutPlanActionSuccess) {
+              // Show success message
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(state.message)),
               );
@@ -59,62 +90,39 @@ class _DashboardWorkoutWeekDetailsScreenState extends State<DashboardWorkoutWeek
                 _loadDays();
               }
             }
-          },
-          builder: (context, state) {
-            // First check if we have days data to display
+            
+            // Update local state based on bloc state
             if (state is DashboardWorkoutDaysLoaded && state.weekId == widget.weekId) {
-              return _buildDaysList(context, state.days);
+              setState(() {
+                _days = state.days;
+                _isLoading = false;
+                _errorMessage = null;
+                _isInitialLoadDone = true;
+              });
+            } else if (state is DashboardWorkoutPlanError) {
+              setState(() {
+                _errorMessage = state.message;
+                _isLoading = false;
+              });
+            }
+          },
+          child: Builder(builder: (context) {
+            // Show loading state
+            if (_isLoading && !_isInitialLoadDone) {
+              return const Center(child: LoadingIndicator());
             }
             
-            // Check for loading state
-            if (state is DashboardWorkoutPlanLoading) {
-              return const Center(child: LoadingIndicator());
-            } 
-            
-            // Check for error state
-            else if (state is DashboardWorkoutPlanError) {
+            // Show error state
+            if (_errorMessage != null) {
               return ErrorView(
-                message: state.message,
+                message: _errorMessage!,
                 onRetry: _loadDays,
               );
-            } 
-            
-            // Check for success action state
-            else if (state is DashboardWorkoutPlanActionSuccess) {
-              // Automatically reload data after a short delay
-              Future.delayed(const Duration(milliseconds: 300), () {
-                if (mounted) {
-                  _loadDays();
-                }
-              });
-              
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(state.message),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: _loadDays,
-                      child: const Text('تحديث البيانات'),
-                    ),
-                  ],
-                ),
-              );
-            } 
-            
-            // Fallback - show loading instead of "choose a week"
-            else {
-              // Try to load days again
-              Future.delayed(const Duration(milliseconds: 100), () {
-                if (mounted) {
-                  _loadDays();
-                }
-              });
-              
-              return const Center(child: LoadingIndicator());
             }
-          },
+            
+            // Show days list or empty state
+            return _days.isEmpty ? _buildEmptyDaysList(context) : _buildDaysList(context, _days);
+          }),
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -286,22 +294,52 @@ class _DashboardWorkoutWeekDetailsScreenState extends State<DashboardWorkoutWeek
   }
 
   void _confirmDeleteDay(BuildContext context, DashboardWorkoutDayModel day) {
+    // احتفظ بمرجع للـ cubit من السياق الأصلي
+    final cubit = context.read<DashboardWorkoutPlanCubit>();
+    
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('تأكيد الحذف'),
         content: Text('هل أنت متأكد من حذف ${_getDayName(day.dayNumber)}؟'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('إلغاء'),
           ),
           TextButton(
             onPressed: () {
-              context.read<DashboardWorkoutPlanCubit>().deleteDay(day.id!, widget.weekId);
-              Navigator.pop(context);
+              cubit.deleteDay(day.id!, widget.weekId);
+              Navigator.pop(dialogContext);
             },
             child: const Text('حذف', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  /// بناء واجهة لقائمة أيام فارغة
+  Widget _buildEmptyDaysList(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.calendar_today, size: 64, color: Colors.grey),
+          const SizedBox(height: 16),
+          const Text(
+            'لا توجد أيام في هذا الأسبوع',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'اضغط على زر الإضافة لإنشاء يوم جديد',
+            style: TextStyle(fontSize: 14, color: Colors.grey),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: () => _showAddDayDialog(context),
+            child: const Text('إضافة يوم'),
           ),
         ],
       ),

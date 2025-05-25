@@ -112,21 +112,34 @@ class _DashboardWorkoutPlanDetailsScreenState extends State<DashboardWorkoutPlan
               );
             } 
             
-            // If we have a plan loaded but no weeks yet, show loading
+            // If we have a plan loaded but no weeks yet, show the weeks list (even if empty)
             else if (plan != null) {
-              // Try to load weeks again if we have a plan but no weeks
-              Future.delayed(const Duration(milliseconds: 100), () {
+              // Load weeks once more but don't keep trying indefinitely
+              // This prevents infinite loading loops
+              Future.delayed(const Duration(milliseconds: 300), () {
                 if (mounted) {
                   context.read<DashboardWorkoutPlanCubit>().getWeeksForPlan(widget.planId);
                 }
               });
               
-              return const Center(child: LoadingIndicator());
+              // Show empty weeks list with add button instead of infinite loading
+              return _buildEmptyWeeksList(context);
             }
             
-            // Fallback - show loading instead of "choose a plan"
+            // Fallback - show a message to select a plan
             else {
-              return const Center(child: LoadingIndicator());
+              // Try to load plan details once
+              Future.delayed(const Duration(milliseconds: 300), () {
+                if (mounted) {
+                  _loadPlanDetails();
+                }
+              });
+              
+              return const Center(
+                child: Text('اختر خطة تمرين للعرض', 
+                  style: TextStyle(fontSize: 16),
+                ),
+              );
             }
           },
         ),
@@ -265,22 +278,52 @@ class _DashboardWorkoutPlanDetailsScreenState extends State<DashboardWorkoutPlan
   }
 
   void _confirmDeleteWeek(BuildContext context, DashboardWorkoutWeekModel week) {
+    // احتفظ بمرجع للـ cubit من السياق الأصلي
+    final cubit = context.read<DashboardWorkoutPlanCubit>();
+    
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('تأكيد الحذف'),
         content: Text('هل أنت متأكد من حذف الأسبوع ${week.weekNumber}؟'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('إلغاء'),
           ),
           TextButton(
             onPressed: () {
-              context.read<DashboardWorkoutPlanCubit>().deleteWeek(week.id!, widget.planId);
-              Navigator.pop(context);
+              cubit.deleteWeek(week.id!, widget.planId);
+              Navigator.pop(dialogContext);
             },
             child: const Text('حذف', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  /// بناء واجهة لقائمة أسابيع فارغة
+  Widget _buildEmptyWeeksList(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.calendar_today, size: 64, color: Colors.grey),
+          const SizedBox(height: 16),
+          const Text(
+            'لا توجد أسابيع في هذه الخطة',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'اضغط على زر الإضافة لإنشاء أسبوع جديد',
+            style: TextStyle(fontSize: 14, color: Colors.grey),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: () => _showAddWeekDialog(context),
+            child: const Text('إضافة أسبوع'),
           ),
         ],
       ),
