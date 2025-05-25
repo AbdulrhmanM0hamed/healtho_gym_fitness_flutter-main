@@ -8,6 +8,8 @@ import 'package:healtho_gym/dashboard/features/exercise_category/presentation/vi
 import 'package:healtho_gym/dashboard/features/health_tip/presentation/screens/health_tips_list_screen.dart';
 import 'package:healtho_gym/dashboard/features/user/presentation/screens/users_list_screen.dart';
 import 'package:healtho_gym/dashboard/features/exercise_category/presentation/screens/exercise_categories_screen.dart';
+import 'package:healtho_gym/dashboard/features/workout_plan/presentation/screens/dashboard_workout_plans_screen.dart';
+import 'package:healtho_gym/dashboard/features/workout_plan/presentation/viewmodels/dashboard_workout_plan_cubit.dart';
 import 'package:healtho_gym/dashboard/presentation/widgets/dashboard_menu_item.dart';
 import 'package:healtho_gym/dashboard/routes/dashboard_routes.dart';
 
@@ -37,6 +39,10 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen> {
       ],
       child: const AllExercisesScreen(),
     ),
+    BlocProvider(
+      create: (context) => sl<DashboardWorkoutPlanCubit>()..getAllWorkoutPlans(),
+      child: const DashboardWorkoutPlansScreen(),
+    ),
     const Center(child: Text('Settings')),
   ];
 
@@ -62,7 +68,6 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen> {
             _scaffoldKey.currentState!.openDrawer();
           },
         ),
-     
       ),
       drawer: Drawer(
         child: ListView(
@@ -133,10 +138,16 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen> {
               onTap: () => _onItemTapped(4),
             ),
             DashboardMenuItem(
-              icon: Icons.settings,
-              title: 'Settings',
+              icon: Icons.directions_run,
+              title: 'خطط التمرين',
               isSelected: _selectedIndex == 5,
               onTap: () => _onItemTapped(5),
+            ),
+            DashboardMenuItem(
+              icon: Icons.settings,
+              title: 'Settings',
+              isSelected: _selectedIndex == 6,
+              onTap: () => _onItemTapped(6),
             ),
             const Divider(),
             ListTile(
@@ -190,6 +201,11 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen> {
                   icon: Icon(Icons.fitness_center_outlined),
                   selectedIcon: Icon(Icons.fitness_center),
                   label: Text('All Exercises'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.directions_run_outlined),
+                  selectedIcon: Icon(Icons.directions_run),
+                  label: Text('خطط التمرين'),
                 ),
                 NavigationRailDestination(
                   icon: Icon(Icons.settings_outlined),

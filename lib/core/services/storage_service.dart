@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:path/path.dart' as path;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:healtho_gym/core/services/supabase_service.dart';
 
 class StorageService {
@@ -11,6 +12,7 @@ class StorageService {
   // Constants for bucket names
   static const String exerciseCategoriesBucket = 'exercise-categories';
   static const String exercisesBucket = 'exercises';
+  static const String workoutPlanBucket = 'workoutplan';
 
   // Upload category image
   Future<String> uploadCategoryImage(File imageFile) async {
@@ -72,6 +74,28 @@ class StorageService {
       return urls;
     } catch (e) {
       throw Exception('Failed to upload exercise gallery images: $e');
+    }
+  }
+
+  // Upload workout plan image
+  Future<String> uploadWorkoutPlanImage(XFile imageFile, String planId) async {
+    try {
+      final String fileName = '${planId}_${DateTime.now().millisecondsSinceEpoch}.${imageFile.path.split('.').last}';
+      final filePath = 'plans/$fileName';
+      
+      final fileBytes = await imageFile.readAsBytes();
+      
+      await _supabase.storage
+          .from(workoutPlanBucket)
+          .uploadBinary(filePath, fileBytes);
+      
+      final imageUrl = _supabase.storage
+          .from(workoutPlanBucket)
+          .getPublicUrl(filePath);
+      
+      return imageUrl;
+    } catch (e) {
+      throw Exception('Failed to upload workout plan image: $e');
     }
   }
 

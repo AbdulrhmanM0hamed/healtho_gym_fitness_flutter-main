@@ -17,8 +17,9 @@ class WorkoutPlanScreen extends StatefulWidget {
 
 class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
   late WorkoutPlanCubit _workoutPlanCubit;
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
-  
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
+
   // Filter variables
   String selectedCategory = 'All';
   String selectedLevel = 'All';
@@ -30,7 +31,7 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
   Map<String, int> categoryIds = {'All': 0};
   List<String> levels = ['All', 'مبتدئ', 'متقدم', 'محترف'];
   List<String> durations = ['All', '4 Weeks', '8 Weeks', '12 Weeks'];
-  
+
   @override
   void initState() {
     super.initState();
@@ -38,34 +39,34 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
     _workoutPlanCubit.getWorkoutPlans();
     _loadFilterData();
   }
-  
+
   Future<void> _loadFilterData() async {
     try {
       // Load categories
       final categoriesData = await sl<FiltersRepository>().getCategories();
       final categoryList = ['All'];
       final categoryIdMap = {'All': 0};
-      
+
       for (var category in categoriesData) {
         categoryList.add(category.name);
         categoryIdMap[category.name] = category.id;
       }
-      
+
       // Load levels
       final levelsData = await sl<FiltersRepository>().getLevels();
       final levelsList = ['All', ...levelsData];
-      
+
       // Load durations
       final durationsData = await sl<FiltersRepository>().getDurations();
       final durationsList = ['All', ...durationsData];
-      
+
       setState(() {
         categories = categoryList;
         categoryIds = categoryIdMap;
         levels = levelsList;
         durations = durationsList;
       });
-      
+
       // Debug print to verify data
       print('Categories loaded: $categoryList');
       print('Category IDs: $categoryIdMap');
@@ -76,33 +77,34 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
       print('Error loading filter data: $e');
     }
   }
-  
+
   Future<void> _refreshPlans() async {
     _workoutPlanCubit.getWorkoutPlans();
   }
-  
+
   void _applyFilters() {
     int? categoryId;
     if (selectedCategory != 'All') {
       categoryId = categoryIds[selectedCategory];
       print('Filtering by category: $selectedCategory (ID: $categoryId)');
     }
-    
+
     String? levelFilter;
     if (selectedLevel != 'All') {
       levelFilter = selectedLevel;
       print('Filtering by level: $levelFilter');
     }
-    
-    String? durationFilter = selectedDuration == 'All' ? null : selectedDuration;
+
+    String? durationFilter =
+        selectedDuration == 'All' ? null : selectedDuration;
     if (durationFilter != null) {
       print('Filtering by duration: $durationFilter');
     }
-    
+
     setState(() {
       isFilterApplied = true;
     });
-    
+
     _workoutPlanCubit.filterPlans(
       categoryId: categoryId,
       level: levelFilter,
@@ -153,7 +155,7 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
                 }
               },
             ),
-            
+
             // Plans list
             Expanded(
               child: BlocBuilder<WorkoutPlanCubit, WorkoutPlanState>(
@@ -164,7 +166,7 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
                     return Center(child: Text(state.message));
                   } else if (state is WorkoutPlansListLoaded) {
                     final plans = state.plans;
-                    
+
                     if (plans.isEmpty) {
                       return Center(
                         child: Column(
@@ -189,28 +191,22 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
                         ),
                       );
                     }
-                    
+
                     return RefreshIndicator(
                       key: _refreshIndicatorKey,
                       onRefresh: _refreshPlans,
                       child: ListView.builder(
-                        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 15, horizontal: 15),
                         itemCount: plans.length + (state.hasMoreData ? 1 : 0),
                         itemBuilder: (context, index) {
                           if (index == plans.length) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 15),
-                              child: Center(
-                                child: RoundButton(
-                                  title: "تحميل المزيد",
-                                  onPressed: () {
-                                    context.read<WorkoutPlanCubit>().loadMorePlans();
-                                  },
-                                ),
-                              ),
+                            return const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 15),
+                              child: SizedBox(),
                             );
                           }
-                          
+
                           final plan = plans[index];
                           return PlanCard(
                             plan: plan,
@@ -226,7 +222,9 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
                             },
                             onFavoriteClick: () {
                               try {
-                                context.read<WorkoutPlanCubit>().togglePlanFavorite(plan.id);
+                                context
+                                    .read<WorkoutPlanCubit>()
+                                    .togglePlanFavorite(plan.id);
                                 // Show success message
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
@@ -242,7 +240,8 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
                                 // Show error message
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('حدث خطأ أثناء تحديث المفضلة'),
+                                    content:
+                                        Text('حدث خطأ أثناء تحديث المفضلة'),
                                     duration: Duration(seconds: 1),
                                   ),
                                 );
@@ -253,7 +252,7 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
                       ),
                     );
                   }
-                  
+
                   return const Center(child: Text('جاري تحميل خطط التمرين...'));
                 },
               ),
@@ -263,4 +262,4 @@ class _WorkoutPlanScreenState extends State<WorkoutPlanScreen> {
       ),
     );
   }
-} 
+}

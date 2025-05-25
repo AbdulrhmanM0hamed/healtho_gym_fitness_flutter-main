@@ -26,7 +26,6 @@ class AppRoutes {
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     // Extract route name
     final name = settings.name;
-    final arguments = settings.arguments;
     
     // Default transition animation
     return MaterialPageRoute(

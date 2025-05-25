@@ -18,7 +18,7 @@ class ImagePickerWidget extends StatelessWidget {
   static Future<List<File>> pickMultipleImages() async {
     final picker = ImagePicker();
     final pickedFiles = await picker.pickMultiImage();
-    if (pickedFiles != null) {
+    if (pickedFiles.isNotEmpty) {
       return pickedFiles.map((e) => File(e.path)).toList();
     }
     return [];

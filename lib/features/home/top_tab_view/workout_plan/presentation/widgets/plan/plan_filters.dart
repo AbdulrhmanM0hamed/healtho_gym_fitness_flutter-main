@@ -33,34 +33,9 @@ class PlanFilters extends StatelessWidget {
       child: Column(
         children: [
           // Category Filter
-          DropdownButtonFormField<String>(
-            value: selectedCategory,
-            decoration: InputDecoration(
-              labelText: 'الفئة',
-              labelStyle: TextStyle(color: TColor.primaryText),
-              border: const OutlineInputBorder(),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              alignLabelWithHint: true,
-            ),
-            isExpanded: true,
-            alignment: AlignmentDirectional.centerEnd,
-            items: categories.map((String category) {
-              return DropdownMenuItem<String>(
-                value: category,
-                alignment: AlignmentDirectional.centerEnd,
-                child: Text(
-                  category,
-                  textAlign: TextAlign.right,
-                  textDirection: TextDirection.rtl,
-                ),
-              );
-            }).toList(),
-            onChanged: onCategoryChanged,
-            icon: const Icon(Icons.arrow_drop_down),
-            dropdownColor: Colors.white,
-          ),
+   
           const SizedBox(height: 8),
-          
+
           // Level Filter
           DropdownButtonFormField<String>(
             value: selectedLevel,
@@ -68,7 +43,8 @@ class PlanFilters extends StatelessWidget {
               labelText: 'المستوى',
               labelStyle: TextStyle(color: TColor.primaryText),
               border: const OutlineInputBorder(),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               alignLabelWithHint: true,
             ),
             isExpanded: true,
@@ -76,11 +52,8 @@ class PlanFilters extends StatelessWidget {
             items: levels.map((String level) {
               return DropdownMenuItem<String>(
                 value: level,
-                alignment: AlignmentDirectional.centerEnd,
                 child: Text(
                   level,
-                  textAlign: TextAlign.right,
-                  textDirection: TextDirection.rtl,
                 ),
               );
             }).toList(),
@@ -89,7 +62,7 @@ class PlanFilters extends StatelessWidget {
             dropdownColor: Colors.white,
           ),
           const SizedBox(height: 8),
-          
+
           // Duration Filter
           DropdownButtonFormField<String>(
             value: selectedDuration,
@@ -97,7 +70,8 @@ class PlanFilters extends StatelessWidget {
               labelText: 'المدة',
               labelStyle: TextStyle(color: TColor.primaryText),
               border: const OutlineInputBorder(),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               alignLabelWithHint: true,
             ),
             isExpanded: true,
@@ -105,11 +79,8 @@ class PlanFilters extends StatelessWidget {
             items: durations.map((String duration) {
               return DropdownMenuItem<String>(
                 value: duration,
-                alignment: AlignmentDirectional.centerEnd,
                 child: Text(
                   duration,
-                  textAlign: TextAlign.right,
-                  textDirection: TextDirection.rtl,
                 ),
               );
             }).toList(),
