@@ -24,40 +24,68 @@ class DashboardWorkoutPlanDetailsScreen extends StatefulWidget {
 
 class _DashboardWorkoutPlanDetailsScreenState extends State<DashboardWorkoutPlanDetailsScreen> {
   DashboardWorkoutPlanModel? plan;
+  List<DashboardWorkoutWeekModel> _weeks = [];
+  bool _isLoading = true;
+  bool _isInitialLoadDone = false;
+  String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
-    _loadPlanDetails();
+    // Delay initial load slightly to avoid build issues
+    Future.microtask(_loadPlanDetails);
   }
 
-  void _loadPlanDetails() {
-    // Load plan details and weeks for the plan
-    context.read<DashboardWorkoutPlanCubit>().getWorkoutPlanById(widget.planId);
-    context.read<DashboardWorkoutPlanCubit>().getWeeksForPlan(widget.planId);
+  Future<void> _loadPlanDetails() async {
+    if (!mounted) return;
+    
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+    
+    try {
+      // Load plan details first
+      await context.read<DashboardWorkoutPlanCubit>().getWorkoutPlanById(widget.planId);
+      // Then load weeks for the plan (only once)
+      if (!_isInitialLoadDone) {
+        await context.read<DashboardWorkoutPlanCubit>().getWeeksForPlan(widget.planId);
+        _isInitialLoadDone = true;
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'فشل في تحميل بيانات الخطة: $e';
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: BlocBuilder<DashboardWorkoutPlanCubit, DashboardWorkoutPlanState>(
-          builder: (context, state) {
-            if (state is DashboardWorkoutPlanLoaded) {
-              plan = state.plan;
-              return Text(state.plan.title);
-            }
-            return const Text('تفاصيل الخطة');
-          },
-        ),
+        title: Text(plan?.title ?? 'تفاصيل الخطة'),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _loadPlanDetails,
+            tooltip: 'تحديث',
+          ),
+        ],
       ),
       body: RefreshIndicator(
-        onRefresh: () async {
-          _loadPlanDetails();
-        },
-        child: BlocConsumer<DashboardWorkoutPlanCubit, DashboardWorkoutPlanState>(
+        onRefresh: _loadPlanDetails,
+        child: BlocListener<DashboardWorkoutPlanCubit, DashboardWorkoutPlanState>(
           listener: (context, state) {
+            // Handle state changes
             if (state is DashboardWorkoutPlanActionSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(state.message)),
@@ -68,80 +96,42 @@ class _DashboardWorkoutPlanDetailsScreenState extends State<DashboardWorkoutPlan
                 _loadPlanDetails();
               }
             }
+            
+            // Update local state based on bloc state
+            if (state is DashboardWorkoutWeeksLoaded && state.planId == widget.planId) {
+              setState(() {
+                _weeks = state.weeks;
+                _isLoading = false;
+                _errorMessage = null;
+              });
+            } else if (state is DashboardWorkoutPlanLoaded && state.plan.id == widget.planId) {
+              setState(() {
+                plan = state.plan;
+              });
+            } else if (state is DashboardWorkoutPlanError) {
+              setState(() {
+                _errorMessage = state.message;
+                _isLoading = false;
+              });
+            }
           },
-          builder: (context, state) {
-            // First check if we have weeks data to display
-            if (state is DashboardWorkoutWeeksLoaded) {
-              return _buildWeeksList(context, state.weeks);
+          child: Builder(builder: (context) {
+            // Show loading state
+            if (_isLoading && !_isInitialLoadDone) {
+              return const Center(child: LoadingIndicator());
             }
             
-            // Check for loading state
-            if (state is DashboardWorkoutPlanLoading) {
-              return const Center(child: LoadingIndicator());
-            } 
-            
-            // Check for error state
-            else if (state is DashboardWorkoutPlanError) {
+            // Show error state
+            if (_errorMessage != null) {
               return ErrorView(
-                message: state.message,
+                message: _errorMessage!,
                 onRetry: _loadPlanDetails,
               );
-            } 
-            
-            // Check for success action state
-            else if (state is DashboardWorkoutPlanActionSuccess) {
-              // Automatically reload data after a short delay
-              Future.delayed(const Duration(milliseconds: 300), () {
-                if (mounted) {
-                  _loadPlanDetails();
-                }
-              });
-              
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(state.message),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: _loadPlanDetails,
-                      child: const Text('تحديث البيانات'),
-                    ),
-                  ],
-                ),
-              );
-            } 
-            
-            // If we have a plan loaded but no weeks yet, show the weeks list (even if empty)
-            else if (plan != null) {
-              // Load weeks once more but don't keep trying indefinitely
-              // This prevents infinite loading loops
-              Future.delayed(const Duration(milliseconds: 300), () {
-                if (mounted) {
-                  context.read<DashboardWorkoutPlanCubit>().getWeeksForPlan(widget.planId);
-                }
-              });
-              
-              // Show empty weeks list with add button instead of infinite loading
-              return _buildEmptyWeeksList(context);
             }
             
-            // Fallback - show a message to select a plan
-            else {
-              // Try to load plan details once
-              Future.delayed(const Duration(milliseconds: 300), () {
-                if (mounted) {
-                  _loadPlanDetails();
-                }
-              });
-              
-              return const Center(
-                child: Text('اختر خطة تمرين للعرض', 
-                  style: TextStyle(fontSize: 16),
-                ),
-              );
-            }
-          },
+            // Show weeks list or empty state
+            return _weeks.isEmpty ? _buildEmptyWeeksList(context) : _buildWeeksList(context, _weeks);
+          }),
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -169,9 +159,14 @@ class _DashboardWorkoutPlanDetailsScreenState extends State<DashboardWorkoutPlan
               style: TextStyle(fontSize: 14, color: Colors.grey),
             ),
             const SizedBox(height: 24),
-            ElevatedButton(
+            ElevatedButton.icon(
               onPressed: () => _showAddWeekDialog(context),
-              child: const Text('إضافة أسبوع'),
+              icon: const Icon(Icons.add),
+              label: const Text('إضافة أسبوع'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
             ),
           ],
         ),
@@ -183,53 +178,131 @@ class _DashboardWorkoutPlanDetailsScreenState extends State<DashboardWorkoutPlan
       itemCount: weeks.length,
       itemBuilder: (context, index) {
         final week = weeks[index];
-        return Card(
+        return Container(
           margin: const EdgeInsets.only(bottom: 16),
-          elevation: 2,
-          child: ListTile(
-            contentPadding: const EdgeInsets.all(16),
-            title: Text(
-              'الأسبوع ${week.weekNumber}',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 8),
-                Text(week.description),
-              ],
-            ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.blue),
-                  onPressed: () => _showEditWeekDialog(context, week),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () => _confirmDeleteWeek(context, week),
-                ),
-              ],
-            ),
-            onTap: () {
-              // Store the cubit instance before navigation
-              final cubit = context.read<DashboardWorkoutPlanCubit>();
-              
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => BlocProvider.value(
-                    value: cubit,
-                    child: DashboardWorkoutWeekDetailsScreen(
-                      weekId: week.id!,
-                      weekNumber: week.weekNumber,
-                      planId: widget.planId,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Material(
+            borderRadius: BorderRadius.circular(12),
+            color: Colors.white,
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: () {
+                // Store the cubit instance before navigation
+                final cubit = context.read<DashboardWorkoutPlanCubit>();
+                
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BlocProvider.value(
+                      value: cubit,
+                      child: DashboardWorkoutWeekDetailsScreen(
+                        weekId: week.id!,
+                        weekNumber: week.weekNumber,
+                        planId: widget.planId,
+                      ),
                     ),
                   ),
-                ),
-              ).then((_) => _loadPlanDetails());
-            },
+                ).then((_) => _loadPlanDetails());
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header with week number and actions
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor.withOpacity(0.1),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(12),
+                        topRight: Radius.circular(12),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.calendar_month, size: 24),
+                        const SizedBox(width: 8),
+                        Text(
+                          'الأسبوع ${week.weekNumber}',
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
+                        const Spacer(),
+                        IconButton(
+                          icon: const Icon(Icons.edit, color: Colors.blue),
+                          tooltip: 'تعديل',
+                          onPressed: () => _showEditWeekDialog(context, week),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          tooltip: 'حذف',
+                          onPressed: () => _confirmDeleteWeek(context, week),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Week description
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (week.description.isNotEmpty) ...[  
+                          const Text(
+                            'الوصف:',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black54),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            week.description,
+                            style: const TextStyle(fontSize: 15),
+                          ),
+                        ] else ...[  
+                          const Text(
+                            'لا يوجد وصف',
+                            style: TextStyle(color: Colors.black45, fontStyle: FontStyle.italic),
+                          ),
+                        ],
+                        const SizedBox(height: 8),
+                        // View details button
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: TextButton.icon(
+                            onPressed: () {
+                              // Store the cubit instance before navigation
+                              final cubit = context.read<DashboardWorkoutPlanCubit>();
+                              
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => BlocProvider.value(
+                                    value: cubit,
+                                    child: DashboardWorkoutWeekDetailsScreen(
+                                      weekId: week.id!,
+                                      weekNumber: week.weekNumber,
+                                      planId: widget.planId,
+                                    ),
+                                  ),
+                                ),
+                              ).then((_) => _loadPlanDetails());
+                            },
+                            icon: const Icon(Icons.arrow_forward),
+                            label: const Text('عرض التفاصيل'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         );
       },
@@ -309,21 +382,41 @@ class _DashboardWorkoutPlanDetailsScreenState extends State<DashboardWorkoutPlan
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.calendar_today, size: 64, color: Colors.grey),
-          const SizedBox(height: 16),
-          const Text(
-            'لا توجد أسابيع في هذه الخطة',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'اضغط على زر الإضافة لإنشاء أسبوع جديد',
-            style: TextStyle(fontSize: 14, color: Colors.grey),
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.calendar_today, size: 64, color: Colors.grey),
           ),
           const SizedBox(height: 24),
-          ElevatedButton(
+          Text(
+            'لا توجد أسابيع في هذه الخطة',
+            style: TextStyle(
+              fontSize: 20, 
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).primaryColor,
+            ),
+          ),
+          const SizedBox(height: 12),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 32),
+            child: Text(
+              'قم بإضافة أسبوع جديد لبدء تنظيم خطة التمرين الخاصة بك',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: 32),
+          ElevatedButton.icon(
             onPressed: () => _showAddWeekDialog(context),
-            child: const Text('إضافة أسبوع'),
+            icon: const Icon(Icons.add),
+            label: const Text('إضافة أسبوع جديد'),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
           ),
         ],
       ),

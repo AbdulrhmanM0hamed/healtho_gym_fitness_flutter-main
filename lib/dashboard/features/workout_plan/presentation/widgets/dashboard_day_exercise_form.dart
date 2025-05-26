@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:healtho_gym/core/di/service_locator.dart';
 import 'package:healtho_gym/dashboard/features/workout_plan/data/models/dashboard_day_exercise_model.dart';
-import 'package:healtho_gym/features/home/top_tab_view/workout_plan/data/models/exercise_model.dart';
+import 'package:healtho_gym/features/home/top_tab_view/exercises/data/repositories/exercise_repository.dart';
+import 'package:healtho_gym/features/home/top_tab_view/workout_plan/data/models/exercise_model.dart' as workout_model;
+import 'dart:developer' as dev;
 
 /// نموذج إضافة/تعديل تمرين ليوم محدد
 class DashboardDayExerciseForm extends StatefulWidget {
@@ -26,10 +29,13 @@ class _DashboardDayExerciseFormState extends State<DashboardDayExerciseForm> {
   late TextEditingController _weightController;
   late TextEditingController _restTimeController;
   
-  ExerciseModel? _selectedExercise;
-  List<ExerciseModel> _exercises = [];
+  workout_model.ExerciseModel? _selectedExercise;
+  List<workout_model.ExerciseModel> _exercises = [];
   bool _isLoading = true;
   String? _errorMessage;
+  
+  // استخدام مستودع التمارين للحصول على البيانات
+  final ExerciseRepository _exerciseRepository = sl<ExerciseRepository>();
 
   @override
   void initState() {
@@ -50,18 +56,49 @@ class _DashboardDayExerciseFormState extends State<DashboardDayExerciseForm> {
         _errorMessage = null;
       });
       
-      // محاكاة للحصول على قائمة التمارين
-      // في التطبيق الفعلي يجب استخدام مستودع التمارين
-      await Future.delayed(const Duration(milliseconds: 500));
-      final mockExercises = [
-        ExerciseModel(id: 1, title: 'تمرين ضغط الصدر', mainImageUrl: ''),
-        ExerciseModel(id: 2, title: 'تمرين القرفصاء', mainImageUrl: ''),
-        ExerciseModel(id: 3, title: 'تمرين السحب', mainImageUrl: ''),
-        ExerciseModel(id: 4, title: 'تمرين الضغط الأمامي', mainImageUrl: ''),
-      ];
+      dev.log('Loading exercises from repository');
+      
+      // الحصول على جميع التمارين من جميع الفئات
+      List<workout_model.ExerciseModel> allExercises = [];
+      
+      try {
+        // الحصول على جميع فئات التمارين
+        final categories = await _exerciseRepository.getExerciseCategories();
+        dev.log('Loaded ${categories.length} exercise categories');
+        
+        // الحصول على التمارين من كل فئة
+        for (var category in categories) {
+          try {
+            final categoryExercises = await _exerciseRepository.getExercisesByCategory(category.id);
+            dev.log('Loaded ${categoryExercises.length} exercises from category ${category.title}');
+            
+            // تحويل نموذج التمرين إلى النموذج المطلوب
+            allExercises.addAll(categoryExercises.map((e) => workout_model.ExerciseModel(
+              id: e.id,
+              title: e.title,
+              mainImageUrl: e.mainImageUrl,
+              description: e.description,
+              categoryId: e.categoryId
+            )));
+          } catch (categoryError) {
+            dev.log('Error loading exercises for category ${category.id}: $categoryError');
+          }
+        }
+      } catch (e) {
+        dev.log('Error loading categories: $e');
+        // في حالة فشل تحميل الفئات، نستخدم بيانات تجريبية
+        allExercises = [
+          workout_model.ExerciseModel(id: 1, title: 'تمرين ضغط الصدر'),
+          workout_model.ExerciseModel(id: 2, title: 'تمرين القرفصاء'),
+          workout_model.ExerciseModel(id: 3, title: 'تمرين السحب'),
+          workout_model.ExerciseModel(id: 4, title: 'تمرين الضغط الأمامي'),
+        ];
+      }
+      
+      dev.log('Loaded ${allExercises.length} exercises');
       
       setState(() {
-        _exercises = mockExercises;
+        _exercises = allExercises;
         _isLoading = false;
         
         // تحديد التمرين المختار إذا كان موجوداً
@@ -129,13 +166,13 @@ class _DashboardDayExerciseFormState extends State<DashboardDayExerciseForm> {
               else ...[
                 const Text('اختر التمرين:'),
                 const SizedBox(height: 8),
-                DropdownButtonFormField<ExerciseModel>(
+                DropdownButtonFormField<workout_model.ExerciseModel>(
                   value: _selectedExercise,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     hintText: 'اختر التمرين',
                   ),
-                  items: _exercises.map((exercise) => DropdownMenuItem<ExerciseModel>(
+                  items: _exercises.map((exercise) => DropdownMenuItem<workout_model.ExerciseModel>(
                     value: exercise,
                     child: Text(exercise.title ?? 'تمرين بدون اسم'),
                   )).toList(),
@@ -256,6 +293,7 @@ class _DashboardDayExerciseFormState extends State<DashboardDayExerciseForm> {
 
   void _submitForm() {
     if (_formKey.currentState!.validate() && _selectedExercise != null) {
+      // تجهيز بيانات التمرين للإرسال إلى قاعدة البيانات
       final exercise = DashboardDayExerciseModel(
         id: widget.exercise.id,
         dayId: widget.exercise.dayId,
@@ -267,12 +305,13 @@ class _DashboardDayExerciseFormState extends State<DashboardDayExerciseForm> {
         notes: _notesController.text.isEmpty ? null : _notesController.text,
         sortOrder: widget.exercise.sortOrder,
         exerciseName: _selectedExercise!.title,
-        exerciseImage: _selectedExercise!.mainImageUrl ?? '',
+        exerciseImage: _selectedExercise!.mainImageUrl ?? '', // هذا للعرض فقط وليس للإرسال لقاعدة البيانات
         createdAt: widget.exercise.createdAt,
         updatedAt: DateTime.now(),
         exerciseDetails: _selectedExercise,
       );
       
+      dev.log('Submitting exercise: ${exercise.exerciseName} with ID: ${exercise.exerciseId}');
       widget.onSubmit(exercise);
     }
   }

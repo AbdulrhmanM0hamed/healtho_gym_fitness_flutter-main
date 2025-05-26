@@ -86,8 +86,11 @@ class DashboardDayExerciseModel extends Equatable {
       'reps': reps,
       'rest_time': restTime,
       'sort_order': sortOrder,
-      'exercise_name': exerciseName,
-      'exercise_image': exerciseImage,
+      // Fields removed as they don't exist in the database schema:
+      // - 'exercise_name'
+      // - 'exercise_image'
+      // - 'weight'
+      // - 'notes'
     };
 
     // إضافة المعرف إذا كان موجودًا (للتحديث)
@@ -100,13 +103,7 @@ class DashboardDayExerciseModel extends Equatable {
       data['day_id'] = dayId;
     }
     
-    // إضافة الوزن والملاحظات إذا كانت موجودة
-    if (weight != null) {
-      data['weight'] = weight;
-    }
-    if (notes != null) {
-      data['notes'] = notes;
-    }
+    // تم إزالة حقول الوزن والملاحظات لأنها غير موجودة في قاعدة البيانات
 
     // إضافة تواريخ الإنشاء والتحديث إذا كانت موجودة
     if (createdAt != null) {

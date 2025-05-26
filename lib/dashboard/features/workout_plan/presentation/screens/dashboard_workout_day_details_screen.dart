@@ -12,12 +12,14 @@ class DashboardWorkoutDayDetailsScreen extends StatefulWidget {
   final int dayId;
   final int dayNumber;
   final int weekId;
+  final String? dayTitle;
 
   const DashboardWorkoutDayDetailsScreen({
     Key? key,
     required this.dayId,
     required this.dayNumber,
     required this.weekId,
+    this.dayTitle,
   }) : super(key: key);
 
   @override

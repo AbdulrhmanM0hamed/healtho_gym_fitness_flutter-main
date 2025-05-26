@@ -134,29 +134,7 @@ class _DashboardWorkoutWeekDetailsScreenState extends State<DashboardWorkoutWeek
 
   Widget _buildDaysList(BuildContext context, List<DashboardWorkoutDayModel> days) {
     if (days.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.calendar_today, size: 64, color: Colors.grey),
-            const SizedBox(height: 16),
-            const Text(
-              'لا توجد أيام في هذا الأسبوع',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'اضغط على زر الإضافة لإنشاء يوم جديد',
-              style: TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () => _showAddDayDialog(context),
-              child: const Text('إضافة يوم'),
-            ),
-          ],
-        ),
-      );
+      return _buildEmptyDaysList(context);
     }
 
     return ListView.builder(
@@ -164,45 +142,24 @@ class _DashboardWorkoutWeekDetailsScreenState extends State<DashboardWorkoutWeek
       itemCount: days.length,
       itemBuilder: (context, index) {
         final day = days[index];
-        return Card(
+        return Container(
           margin: const EdgeInsets.only(bottom: 16),
-          elevation: 2,
-          child: ListTile(
-            contentPadding: const EdgeInsets.all(16),
-            title: Text(
-              _getDayName(day.dayNumber),
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 8),
-                Text(day.dayName),
-                const SizedBox(height: 8),
-                Text(
-                  day.isRestDay ? 'يوم راحة' : 'يوم تمرين',
-                  style: TextStyle(
-                    color: day.isRestDay ? Colors.orange : Colors.green,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.blue),
-                  onPressed: () => _showEditDayDialog(context, day),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () => _confirmDeleteDay(context, day),
-                ),
-              ],
-            ),
-            onTap: () {
-              if (!day.isRestDay) {
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Material(
+            borderRadius: BorderRadius.circular(12),
+            color: Colors.white,
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: () {
                 // Store the cubit instance before navigation
                 final cubit = context.read<DashboardWorkoutPlanCubit>();
                 
@@ -214,13 +171,137 @@ class _DashboardWorkoutWeekDetailsScreenState extends State<DashboardWorkoutWeek
                       child: DashboardWorkoutDayDetailsScreen(
                         dayId: day.id!,
                         dayNumber: day.dayNumber,
+                        dayTitle: day.dayName,
                         weekId: widget.weekId,
                       ),
                     ),
                   ),
                 ).then((_) => _loadDays());
-              }
-            },
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header with day number and actions
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor.withOpacity(0.1),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(12),
+                        topRight: Radius.circular(12),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              '${day.dayNumber}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            day.dayName,
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.edit, color: Colors.blue),
+                          tooltip: 'تعديل',
+                          onPressed: () => _showEditDayDialog(context, day),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          tooltip: 'حذف',
+                          onPressed: () => _confirmDeleteDay(context, day),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Day description and details
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Day type indicator
+                        Text(
+                          day.isRestDay ? 'يوم راحة' : 'يوم تمرين',
+                          style: TextStyle(
+                            color: day.isRestDay ? Colors.orange : Colors.green,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        // Exercise count
+                        if (day.totalExercises > 0) ...[  
+                          Text(
+                            'عدد التمارين: ${day.totalExercises}',
+                            style: const TextStyle(fontSize: 15),
+                          ),
+                        ] else ...[  
+                          const Text(
+                            'لا يوجد تمارين مضافة',
+                            style: TextStyle(color: Colors.black45, fontStyle: FontStyle.italic),
+                          ),
+                        ],
+                        const SizedBox(height: 12),
+                        // View exercises button
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('عرض تمارين اليوم',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                // Store the cubit instance before navigation
+                                final cubit = context.read<DashboardWorkoutPlanCubit>();
+                                
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => BlocProvider.value(
+                                      value: cubit,
+                                      child: DashboardWorkoutDayDetailsScreen(
+                                        dayId: day.id!,
+                                        dayNumber: day.dayNumber,
+                                        weekId: widget.weekId,
+                                      ),
+                                    ),
+                                  ),
+                                ).then((_) => _loadDays());
+                              },
+                              icon: const Icon(Icons.fitness_center, size: 18),
+                              label: const Text('عرض'),
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         );
       },
@@ -273,7 +354,7 @@ class _DashboardWorkoutWeekDetailsScreenState extends State<DashboardWorkoutWeek
       ),
     );
   }
-
+  
   void _showEditDayDialog(BuildContext context, DashboardWorkoutDayModel day) {
     // احتفظ بمرجع للـ cubit من السياق الأصلي
     final cubit = context.read<DashboardWorkoutPlanCubit>();
@@ -325,21 +406,41 @@ class _DashboardWorkoutWeekDetailsScreenState extends State<DashboardWorkoutWeek
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.calendar_today, size: 64, color: Colors.grey),
-          const SizedBox(height: 16),
-          const Text(
-            'لا توجد أيام في هذا الأسبوع',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'اضغط على زر الإضافة لإنشاء يوم جديد',
-            style: TextStyle(fontSize: 14, color: Colors.grey),
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.fitness_center, size: 64, color: Colors.grey),
           ),
           const SizedBox(height: 24),
-          ElevatedButton(
+          Text(
+            'لا توجد أيام في هذا الأسبوع',
+            style: TextStyle(
+              fontSize: 20, 
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).primaryColor,
+            ),
+          ),
+          const SizedBox(height: 12),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 32),
+            child: Text(
+              'قم بإضافة أيام التمرين لهذا الأسبوع لتنظيم جدولك التدريبي',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: 32),
+          ElevatedButton.icon(
             onPressed: () => _showAddDayDialog(context),
-            child: const Text('إضافة يوم'),
+            icon: const Icon(Icons.add),
+            label: const Text('إضافة يوم جديد'),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
           ),
         ],
       ),
