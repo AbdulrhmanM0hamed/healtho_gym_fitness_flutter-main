@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:healtho_gym/common/custom_app_bar.dart';
 import 'package:healtho_gym/dashboard/features/workout_plan/data/models/dashboard_day_exercise_model.dart';
 import 'package:healtho_gym/dashboard/features/workout_plan/presentation/viewmodels/dashboard_workout_plan_cubit.dart';
 import 'package:healtho_gym/dashboard/features/workout_plan/presentation/viewmodels/dashboard_workout_plan_state.dart';
@@ -69,9 +70,8 @@ class _DashboardWorkoutDayDetailsScreenState extends State<DashboardWorkoutDayDe
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_getDayName(widget.dayNumber)),
-        centerTitle: true,
+      appBar: CustomAppBar(
+        title: _getDayName(widget.dayNumber),
       ),
       body: RefreshIndicator(
         onRefresh: () async {

@@ -1,10 +1,7 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:healtho_gym/common/color_extension.dart';
 import 'package:healtho_gym/common_widget/toast_helper.dart';
-import 'package:healtho_gym/core/di/service_locator.dart';
 import 'package:healtho_gym/dashboard/features/exercise_category/data/models/exercise_category_model.dart';
 import 'package:healtho_gym/dashboard/features/exercise_category/presentation/screens/add_edit_category_screen.dart';
 import 'package:healtho_gym/dashboard/features/exercise_category/presentation/viewmodels/exercise_category_cubit.dart';

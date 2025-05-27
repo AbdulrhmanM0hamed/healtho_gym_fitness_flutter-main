@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:healtho_gym/common/color_extension.dart';
+import 'package:healtho_gym/common/custom_app_bar.dart';
+import 'package:healtho_gym/common_widget/round_button.dart';
+import 'package:healtho_gym/common_widget/toast_helper.dart';
 import 'package:image_picker/image_picker.dart';
 import '../viewmodels/health_tip_cubit.dart';
 import '../viewmodels/health_tip_state.dart';
@@ -52,8 +55,11 @@ class _AddHealthTipScreenState extends State<AddHealthTipScreen> {
       }
     } catch (e) {
       print('Error picking image: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error picking image: $e')),
+      ToastHelper.showFlushbar(
+        context: context,
+        title: 'خطأ',
+        message: 'حدث خطأ أثناء اختيار الصورة: $e',
+        type: ToastType.error,
       );
     }
   }
@@ -101,13 +107,17 @@ class _AddHealthTipScreenState extends State<AddHealthTipScreen> {
       }
       
       if (success && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('تم إضافة النصيحة وإرسال إشعار للمستخدمين بنجاح'),
-            backgroundColor: Colors.green,
-          ),
+        // استخدام Future.delayed لتأخير العودة للشاشة السابقة حتى تكتمل عملية عرض الرسالة
+        ToastHelper.showFlushbar(
+          context: context,
+          title: 'تمت العملية بنجاح',
+          message: 'تم إضافة النصيحة وإرسال إشعار للمستخدمين بنجاح',
+          type: ToastType.success,
+          onDismissed: () {
+            // العودة للشاشة السابقة بعد إغلاق الرسالة
+            Navigator.of(context).pop();
+          },
         );
-        Navigator.pop(context);
       }
     }
   }
@@ -117,20 +127,18 @@ class _AddHealthTipScreenState extends State<AddHealthTipScreen> {
     return BlocConsumer<HealthTipCubit, HealthTipState>(
       listener: (context, state) {
         if (state.hasError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.errorMessage),
-              backgroundColor: Colors.red,
-            ),
+          ToastHelper.showFlushbar(
+            context: context,
+            title: 'خطأ',
+            message: state.errorMessage,
+            type: ToastType.error,
           );
         }
       },
       builder: (context, state) {
         return Scaffold(
-          appBar: AppBar(
-            backgroundColor: TColor.secondary,
-            foregroundColor: Colors.white,
-            title: const Text('Add New Health Tip'),
+          appBar:const CustomAppBar(
+            title: 'إضافة نصيحة جديدة',
           ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
@@ -263,19 +271,29 @@ class _AddHealthTipScreenState extends State<AddHealthTipScreen> {
                   const SizedBox(height: 24),
 
                   // Submit Button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: state.isLoading ? null : () => _submitForm(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: TColor.secondary,
-                        foregroundColor: Colors.white,
-                      ),
-                      child: state.isLoading
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text('Save Health Tip', style: TextStyle(fontSize: 16)),
-                    ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: state.isLoading
+                      ? Container(
+                          height: 50,
+                          width: double.infinity,
+                          margin: const EdgeInsets.symmetric(horizontal: 20),
+                          decoration: BoxDecoration(
+                            color: TColor.primary,
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 3,
+                            ),
+                          ),
+                        )
+                      : RoundButton(
+                          title: 'حفظ النصيحة',
+                          onPressed: () => _submitForm(context),
+                          type: RoundButtonType.primary,
+                        ),
                   ),
                 ],
               ),

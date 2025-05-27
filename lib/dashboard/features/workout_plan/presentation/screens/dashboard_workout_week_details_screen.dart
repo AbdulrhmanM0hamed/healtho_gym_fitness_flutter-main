@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:healtho_gym/common/custom_app_bar.dart';
 import 'package:healtho_gym/dashboard/features/workout_plan/data/models/dashboard_workout_day_model.dart';
 import 'package:healtho_gym/dashboard/features/workout_plan/presentation/viewmodels/dashboard_workout_plan_cubit.dart';
 import 'package:healtho_gym/dashboard/features/workout_plan/presentation/viewmodels/dashboard_workout_plan_state.dart';
@@ -68,9 +69,8 @@ class _DashboardWorkoutWeekDetailsScreenState extends State<DashboardWorkoutWeek
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('الأسبوع ${widget.weekNumber}'),
-        centerTitle: true,
+      appBar: CustomAppBar(
+        title: 'الأسبوع ${widget.weekNumber}',
       ),
       body: RefreshIndicator(
         onRefresh: () async {

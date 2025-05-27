@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:healtho_gym/common/custom_app_bar.dart';
 import 'package:healtho_gym/dashboard/features/workout_plan/data/models/dashboard_workout_plan_model.dart';
 import 'package:healtho_gym/dashboard/features/workout_plan/data/models/dashboard_workout_week_model.dart';
 import 'package:healtho_gym/dashboard/features/workout_plan/presentation/viewmodels/dashboard_workout_plan_cubit.dart';
@@ -19,10 +20,12 @@ class DashboardWorkoutPlanDetailsScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<DashboardWorkoutPlanDetailsScreen> createState() => _DashboardWorkoutPlanDetailsScreenState();
+  State<DashboardWorkoutPlanDetailsScreen> createState() =>
+      _DashboardWorkoutPlanDetailsScreenState();
 }
 
-class _DashboardWorkoutPlanDetailsScreenState extends State<DashboardWorkoutPlanDetailsScreen> {
+class _DashboardWorkoutPlanDetailsScreenState
+    extends State<DashboardWorkoutPlanDetailsScreen> {
   DashboardWorkoutPlanModel? plan;
   List<DashboardWorkoutWeekModel> _weeks = [];
   bool _isLoading = true;
@@ -38,18 +41,22 @@ class _DashboardWorkoutPlanDetailsScreenState extends State<DashboardWorkoutPlan
 
   Future<void> _loadPlanDetails() async {
     if (!mounted) return;
-    
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
-    
+
     try {
       // Load plan details first
-      await context.read<DashboardWorkoutPlanCubit>().getWorkoutPlanById(widget.planId);
+      await context
+          .read<DashboardWorkoutPlanCubit>()
+          .getWorkoutPlanById(widget.planId);
       // Then load weeks for the plan (only once)
       if (!_isInitialLoadDone) {
-        await context.read<DashboardWorkoutPlanCubit>().getWeeksForPlan(widget.planId);
+        await context
+            .read<DashboardWorkoutPlanCubit>()
+            .getWeeksForPlan(widget.planId);
         _isInitialLoadDone = true;
       }
     } catch (e) {
@@ -70,41 +77,36 @@ class _DashboardWorkoutPlanDetailsScreenState extends State<DashboardWorkoutPlan
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(plan?.title ?? 'تفاصيل الخطة'),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadPlanDetails,
-            tooltip: 'تحديث',
-          ),
-        ],
+      appBar: CustomAppBar(
+        title: plan?.title ?? 'تفاصيل الخطة',
       ),
       body: RefreshIndicator(
         onRefresh: _loadPlanDetails,
-        child: BlocListener<DashboardWorkoutPlanCubit, DashboardWorkoutPlanState>(
+        child:
+            BlocListener<DashboardWorkoutPlanCubit, DashboardWorkoutPlanState>(
           listener: (context, state) {
             // Handle state changes
             if (state is DashboardWorkoutPlanActionSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(state.message)),
               );
-              
+
               // Reload data after successful action
               if (state.entityType == 'week') {
                 _loadPlanDetails();
               }
             }
-            
+
             // Update local state based on bloc state
-            if (state is DashboardWorkoutWeeksLoaded && state.planId == widget.planId) {
+            if (state is DashboardWorkoutWeeksLoaded &&
+                state.planId == widget.planId) {
               setState(() {
                 _weeks = state.weeks;
                 _isLoading = false;
                 _errorMessage = null;
               });
-            } else if (state is DashboardWorkoutPlanLoaded && state.plan.id == widget.planId) {
+            } else if (state is DashboardWorkoutPlanLoaded &&
+                state.plan.id == widget.planId) {
               setState(() {
                 plan = state.plan;
               });
@@ -120,7 +122,7 @@ class _DashboardWorkoutPlanDetailsScreenState extends State<DashboardWorkoutPlan
             if (_isLoading && !_isInitialLoadDone) {
               return const Center(child: LoadingIndicator());
             }
-            
+
             // Show error state
             if (_errorMessage != null) {
               return ErrorView(
@@ -128,9 +130,11 @@ class _DashboardWorkoutPlanDetailsScreenState extends State<DashboardWorkoutPlan
                 onRetry: _loadPlanDetails,
               );
             }
-            
+
             // Show weeks list or empty state
-            return _weeks.isEmpty ? _buildEmptyWeeksList(context) : _buildWeeksList(context, _weeks);
+            return _weeks.isEmpty
+                ? _buildEmptyWeeksList(context)
+                : _buildWeeksList(context, _weeks);
           }),
         ),
       ),
@@ -141,7 +145,8 @@ class _DashboardWorkoutPlanDetailsScreenState extends State<DashboardWorkoutPlan
     );
   }
 
-  Widget _buildWeeksList(BuildContext context, List<DashboardWorkoutWeekModel> weeks) {
+  Widget _buildWeeksList(
+      BuildContext context, List<DashboardWorkoutWeekModel> weeks) {
     if (weeks.isEmpty) {
       return Center(
         child: Column(
@@ -164,8 +169,10 @@ class _DashboardWorkoutPlanDetailsScreenState extends State<DashboardWorkoutPlan
               icon: const Icon(Icons.add),
               label: const Text('إضافة أسبوع'),
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8)),
               ),
             ),
           ],
@@ -198,7 +205,7 @@ class _DashboardWorkoutPlanDetailsScreenState extends State<DashboardWorkoutPlan
               onTap: () {
                 // Store the cubit instance before navigation
                 final cubit = context.read<DashboardWorkoutPlanCubit>();
-                
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -218,7 +225,8 @@ class _DashboardWorkoutPlanDetailsScreenState extends State<DashboardWorkoutPlan
                 children: [
                   // Header with week number and actions
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
                       color: Theme.of(context).primaryColor.withOpacity(0.1),
                       borderRadius: const BorderRadius.only(
@@ -232,7 +240,8 @@ class _DashboardWorkoutPlanDetailsScreenState extends State<DashboardWorkoutPlan
                         const SizedBox(width: 8),
                         Text(
                           'الأسبوع ${week.weekNumber}',
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
                         ),
                         const Spacer(),
                         IconButton(
@@ -254,20 +263,24 @@ class _DashboardWorkoutPlanDetailsScreenState extends State<DashboardWorkoutPlan
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (week.description.isNotEmpty) ...[  
+                        if (week.description.isNotEmpty) ...[
                           const Text(
                             'الوصف:',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black54),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black54),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             week.description,
                             style: const TextStyle(fontSize: 15),
                           ),
-                        ] else ...[  
+                        ] else ...[
                           const Text(
                             'لا يوجد وصف',
-                            style: TextStyle(color: Colors.black45, fontStyle: FontStyle.italic),
+                            style: TextStyle(
+                                color: Colors.black45,
+                                fontStyle: FontStyle.italic),
                           ),
                         ],
                         const SizedBox(height: 8),
@@ -277,8 +290,9 @@ class _DashboardWorkoutPlanDetailsScreenState extends State<DashboardWorkoutPlan
                           child: TextButton.icon(
                             onPressed: () {
                               // Store the cubit instance before navigation
-                              final cubit = context.read<DashboardWorkoutPlanCubit>();
-                              
+                              final cubit =
+                                  context.read<DashboardWorkoutPlanCubit>();
+
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -319,7 +333,7 @@ class _DashboardWorkoutPlanDetailsScreenState extends State<DashboardWorkoutPlan
 
     // Capture the cubit instance before showing the dialog
     final cubit = context.read<DashboardWorkoutPlanCubit>();
-    
+
     showDialog(
       context: context,
       builder: (dialogContext) => Dialog(
@@ -335,7 +349,8 @@ class _DashboardWorkoutPlanDetailsScreenState extends State<DashboardWorkoutPlan
     );
   }
 
-  void _showEditWeekDialog(BuildContext context, DashboardWorkoutWeekModel week) {
+  void _showEditWeekDialog(
+      BuildContext context, DashboardWorkoutWeekModel week) {
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -350,10 +365,11 @@ class _DashboardWorkoutPlanDetailsScreenState extends State<DashboardWorkoutPlan
     );
   }
 
-  void _confirmDeleteWeek(BuildContext context, DashboardWorkoutWeekModel week) {
+  void _confirmDeleteWeek(
+      BuildContext context, DashboardWorkoutWeekModel week) {
     // احتفظ بمرجع للـ cubit من السياق الأصلي
     final cubit = context.read<DashboardWorkoutPlanCubit>();
-    
+
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -375,7 +391,7 @@ class _DashboardWorkoutPlanDetailsScreenState extends State<DashboardWorkoutPlan
       ),
     );
   }
-  
+
   /// بناء واجهة لقائمة أسابيع فارغة
   Widget _buildEmptyWeeksList(BuildContext context) {
     return Center(
@@ -388,13 +404,14 @@ class _DashboardWorkoutPlanDetailsScreenState extends State<DashboardWorkoutPlan
               color: Colors.grey.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.calendar_today, size: 64, color: Colors.grey),
+            child:
+                const Icon(Icons.calendar_today, size: 64, color: Colors.grey),
           ),
           const SizedBox(height: 24),
           Text(
             'لا توجد أسابيع في هذه الخطة',
             style: TextStyle(
-              fontSize: 20, 
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Theme.of(context).primaryColor,
             ),
@@ -415,7 +432,8 @@ class _DashboardWorkoutPlanDetailsScreenState extends State<DashboardWorkoutPlan
             label: const Text('إضافة أسبوع جديد'),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
             ),
           ),
         ],

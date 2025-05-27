@@ -16,14 +16,14 @@ class UsersListScreen extends StatefulWidget {
 
 class _UsersListScreenState extends State<UsersListScreen> {
   late final UserManagementCubit _userManagementCubit;
-  
+
   @override
   void initState() {
     super.initState();
     _userManagementCubit = sl<UserManagementCubit>();
     _userManagementCubit.loadUsers();
   }
-  
+
   @override
   void dispose() {
     // No need to close the cubit here as it will be handled by the service locator
@@ -51,11 +51,12 @@ class _UsersListScreenState extends State<UsersListScreen> {
             ),
             child: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
+                    const Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -67,19 +68,13 @@ class _UsersListScreenState extends State<UsersListScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'عرض وتعديل صلاحيات المستخدمين',
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
-                            fontSize: 14,
-                          ),
-                        ),
                       ],
                     ),
                     IconButton(
-                      onPressed: () => context.read<UserManagementCubit>().loadUsers(),
-                      icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+                      onPressed: () =>
+                          context.read<UserManagementCubit>().loadUsers(),
+                      icon: const Icon(Icons.refresh_rounded,
+                          color: Colors.white),
                       tooltip: 'تحديث القائمة',
                       style: IconButton.styleFrom(
                         backgroundColor: Colors.white.withOpacity(0.1),
@@ -130,12 +125,16 @@ class _UsersListScreenState extends State<UsersListScreen> {
                         color: Colors.red.withOpacity(0.1),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.error_outline_rounded, color: Colors.red, size: 48),
+                      child: const Icon(Icons.error_outline_rounded,
+                          color: Colors.red, size: 48),
                     ),
                     const SizedBox(height: 16),
                     Text(
                       'عذراً، حدث خطأ',
-                      style: TextStyle(color: Colors.grey[800], fontSize: 20, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          color: Colors.grey[800],
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -145,18 +144,24 @@ class _UsersListScreenState extends State<UsersListScreen> {
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton.icon(
-                      onPressed: () => context.read<UserManagementCubit>().loadUsers(),
+                      onPressed: () =>
+                          context.read<UserManagementCubit>().loadUsers(),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: TColor.primary,
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+                      icon: const Icon(Icons.refresh_rounded,
+                          color: Colors.white),
                       label: const Text(
                         'إعادة المحاولة',
-                        style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
@@ -174,12 +179,16 @@ class _UsersListScreenState extends State<UsersListScreen> {
                         color: Colors.grey[200],
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(Icons.people_outline, size: 64, color: Colors.grey[400]),
+                      child: Icon(Icons.people_outline,
+                          size: 64, color: Colors.grey[400]),
                     ),
                     const SizedBox(height: 24),
                     Text(
                       'لا يوجد مستخدمون',
-                      style: TextStyle(color: Colors.grey[800], fontSize: 24, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          color: Colors.grey[800],
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -214,17 +223,27 @@ class _UsersListScreenState extends State<UsersListScreen> {
                       leading: CircleAvatar(
                         backgroundColor: TColor.primary.withOpacity(0.1),
                         child: Icon(
-                          profile?.isAdmin == true ? Icons.admin_panel_settings : Icons.person,
-                          color: profile?.isAdmin == true ? Colors.amber : TColor.primary,
+                          profile?.isAdmin == true
+                              ? Icons.admin_panel_settings
+                              : Icons.person,
+                          color: profile?.isAdmin == true
+                              ? Colors.amber
+                              : TColor.primary,
                         ),
                       ),
-                      title: Text(profile?.fullName ?? user.id, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      title: Text(profile?.fullName ?? user.id,
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(user.email ?? '---', style: TextStyle(color: Colors.grey[700], fontSize: 13)),
+                          Text(user.email ?? '---',
+                              style: TextStyle(
+                                  color: Colors.grey[700], fontSize: 13)),
                           if (profile?.updateDate != null)
-                            Text('آخر تحديث: ${_formatDate(profile!.updateDate!)}', style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+                            Text(
+                                'آخر تحديث: ${_formatDate(profile!.updateDate!)}',
+                                style: TextStyle(
+                                    color: Colors.grey[500], fontSize: 12)),
                         ],
                       ),
                       trailing: Row(
@@ -235,7 +254,8 @@ class _UsersListScreenState extends State<UsersListScreen> {
                             activeColor: Colors.amber,
                             onChanged: profile == null
                                 ? null
-                                : (value) => _showAdminStatusConfirmation(context, profile, value),
+                                : (value) => _showAdminStatusConfirmation(
+                                    context, profile, value),
                           ),
                           IconButton(
                             icon: const Icon(Icons.visibility_rounded),
@@ -255,11 +275,11 @@ class _UsersListScreenState extends State<UsersListScreen> {
       ),
     );
   }
-  
+
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
   }
-  
+
   Widget _buildLoadMoreButton(BuildContext context, UserManagementState state) {
     return Center(
       child: Padding(
@@ -295,10 +315,10 @@ class _UsersListScreenState extends State<UsersListScreen> {
       ),
     );
   }
-  
+
   void _showAdminStatusConfirmation(
-    BuildContext context, 
-    UserProfileModel profile, 
+    BuildContext context,
+    UserProfileModel profile,
     bool newStatus,
   ) {
     final action = newStatus ? 'منح' : 'سحب';
@@ -306,7 +326,8 @@ class _UsersListScreenState extends State<UsersListScreen> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text('$action صلاحية الأدمن'),
-        content: Text('هل أنت متأكد من $action صلاحية الأدمن للمستخدم "${profile.fullName ?? profile.userId}"؟'),
+        content: Text(
+            'هل أنت متأكد من $action صلاحية الأدمن للمستخدم "${profile.fullName ?? profile.userId}"؟'),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
@@ -321,12 +342,15 @@ class _UsersListScreenState extends State<UsersListScreen> {
               foregroundColor: Colors.black,
             ),
             onPressed: () {
-              context.read<UserManagementCubit>().toggleAdminStatus(profile.id, profile.userId, newStatus);
+              context
+                  .read<UserManagementCubit>()
+                  .toggleAdminStatus(profile.id, profile.userId, newStatus);
               Navigator.pop(dialogContext);
               ToastHelper.showFlushbar(
                 context: context,
                 title: 'تم التحديث',
-                message: newStatus ? 'تم منح صلاحية الأدمن' : 'تم سحب صلاحية الأدمن',
+                message:
+                    newStatus ? 'تم منح صلاحية الأدمن' : 'تم سحب صلاحية الأدمن',
                 type: ToastType.success,
               );
             },
@@ -336,14 +360,50 @@ class _UsersListScreenState extends State<UsersListScreen> {
       ),
     );
   }
-  
+
   void _showUserDetails(BuildContext context, dynamic user) {
-    // TODO: Implement user details dialog or screen
+    // الحصول على بيانات المستخدم من خلال خاصية profile
+    final profile = user.profile;
+
+    if (profile == null) {
+      ToastHelper.showFlushbar(
+        context: context,
+        title: 'خطأ',
+        message: 'لا يمكن عرض بيانات المستخدم',
+        type: ToastType.error,
+      );
+      return;
+    }
+
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('تفاصيل المستخدم'),
-        content: Text('ID: ${user.id}\nEmail: ${user.profile?.email ?? "---"}'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('معرف المستخدم: ${profile.id}',
+                style: const TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Text('الاسم الكامل: ${profile.fullName ?? "غير متوفر"}'),
+            const SizedBox(height: 4),
+            Text(
+                'العمر: ${profile.age != null ? "${profile.age} سنة" : "غير متوفر"}'),
+            const SizedBox(height: 4),
+            Text(
+                'الطول: ${profile.height != null ? "${profile.height} سم" : "غير متوفر"}'),
+            const SizedBox(height: 4),
+            Text(
+                'الوزن: ${profile.weight != null ? "${profile.weight} كجم" : "غير متوفر"}'),
+            const SizedBox(height: 4),
+            Text('الهدف: ${profile.goal ?? "غير متوفر"}'),
+            const SizedBox(height: 4),
+            Text('مستوى اللياقة: ${profile.fitnessLevel ?? "غير متوفر"}'),
+            const SizedBox(height: 4),
+            Text('حالة الأدمن: ${profile.isAdmin ? "أدمن" : "مستخدم عادي"}'),
+          ],
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
@@ -353,4 +413,4 @@ class _UsersListScreenState extends State<UsersListScreen> {
       ),
     );
   }
-} 
+}

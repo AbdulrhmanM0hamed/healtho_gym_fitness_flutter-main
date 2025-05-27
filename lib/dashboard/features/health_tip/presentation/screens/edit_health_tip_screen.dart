@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:healtho_gym/common/color_extension.dart';
 import 'package:healtho_gym/core/di/service_locator.dart';
+import 'package:healtho_gym/common_widget/toast_helper.dart';
 import '../../data/models/health_tip_model.dart';
 import '../viewmodels/health_tip_cubit.dart';
 import '../viewmodels/health_tip_state.dart';
@@ -62,8 +63,11 @@ class _EditHealthTipScreenState extends State<EditHealthTipScreen> {
       }
     } catch (e) {
       print('Error picking image: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error picking image: $e')),
+      ToastHelper.showFlushbar(
+        context: context,
+        title: 'خطأ',
+        message: 'حدث خطأ أثناء اختيار الصورة: $e',
+        type: ToastType.error,
       );
     }
   }
@@ -106,13 +110,17 @@ class _EditHealthTipScreenState extends State<EditHealthTipScreen> {
       }
 
       if (success && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Health tip updated successfully'),
-            backgroundColor: Colors.green,
-          ),
+        // استخدام onDismissed للعودة للشاشة السابقة بعد إغلاق الرسالة
+        ToastHelper.showFlushbar(
+          context: context,
+          title: 'تمت العملية بنجاح',
+          message: 'تم تعديل النصيحة بنجاح',
+          type: ToastType.success,
+          onDismissed: () {
+            // العودة للشاشة السابقة بعد إغلاق الرسالة
+            Navigator.of(context).pop();
+          },
         );
-        Navigator.pop(context);
       }
     }
   }
@@ -130,11 +138,11 @@ class _EditHealthTipScreenState extends State<EditHealthTipScreen> {
         child: BlocConsumer<HealthTipCubit, HealthTipState>(
           listener: (context, state) {
             if (state.hasError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.errorMessage),
-                  backgroundColor: Colors.red,
-                ),
+              ToastHelper.showFlushbar(
+                context: context,
+                title: 'خطأ',
+                message: state.errorMessage,
+                type: ToastType.error,
               );
             }
             
@@ -308,10 +316,22 @@ class _EditHealthTipScreenState extends State<EditHealthTipScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: TColor.secondary,
                           foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          elevation: 3,
+                          shadowColor: TColor.secondary.withOpacity(0.5),
                         ),
                         child: state.isLoading
-                            ? const CircularProgressIndicator(color: Colors.white)
-                            : const Text('Update Health Tip', style: TextStyle(fontSize: 16)),
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2.5,
+                                ),
+                              )
+                            : const Text('تحديث النصيحة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ],

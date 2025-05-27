@@ -91,6 +91,11 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
     return AppBar(
       backgroundColor: TColor.secondary,
       elevation: 0,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+        onPressed: () => Navigator.pop(context),
+      ),
+      centerTitle: false,
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -99,18 +104,11 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
             style: const TextStyle(
               color: Colors.white,
               fontSize: 24,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.bold, // letterSpacing: -0.5,
               letterSpacing: -0.5,
             ),
           ),
-          Text(
-            'إدارة التمارين',
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
-              fontSize: 16,
-              letterSpacing: 0.2,
-            ),
-          ),
+       
         ],
       ),
       actions: [

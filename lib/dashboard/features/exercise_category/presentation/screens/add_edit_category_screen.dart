@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:healtho_gym/common/custom_app_bar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:healtho_gym/common/color_extension.dart';
 import 'package:healtho_gym/core/di/service_locator.dart';
@@ -70,7 +71,7 @@ class _AddEditCategoryScreenState extends State<AddEditCategoryScreen> {
 
     try {
       final cubit = context.read<ExerciseCategoryCubit>();
-      
+
       if (_isEditing) {
         await cubit.updateCategory(
           widget.category!.copyWith(
@@ -109,14 +110,12 @@ class _AddEditCategoryScreenState extends State<AddEditCategoryScreen> {
       create: (context) => sl<ExerciseCategoryCubit>(),
       child: Scaffold(
         backgroundColor: Colors.grey[100],
-        appBar: AppBar(
-          backgroundColor: TColor.secondary,
-          title: Text(
-            _isEditing ? 'تعديل الفئة' : 'إضافة فئة جديدة',
-            style: const TextStyle(color: Colors.white),
-          ),
+        appBar: CustomAppBar(
+          title: _isEditing ? 'تعديل الفئة' : 'إضافة فئة جديدة',
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: const Icon(
+              Icons.arrow_back_ios_new,
+            ),
             onPressed: () => Navigator.pop(context),
           ),
         ),
@@ -192,7 +191,8 @@ class _AddEditCategoryScreenState extends State<AddEditCategoryScreen> {
                           const SizedBox(height: 16),
                           ImagePickerWidget(
                             imageFile: _imageFile,
-                            networkImage: _isEditing ? widget.category?.imageUrl : null,
+                            networkImage:
+                                _isEditing ? widget.category?.imageUrl : null,
                             onPickImage: _pickImage,
                           ),
                         ],
@@ -227,4 +227,4 @@ class _AddEditCategoryScreenState extends State<AddEditCategoryScreen> {
       ),
     );
   }
-} 
+}
