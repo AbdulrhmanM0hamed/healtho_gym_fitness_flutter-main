@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:healtho_gym/firebase_options.dart';
@@ -10,7 +9,6 @@ import 'package:healtho_gym/core/routes/app_routes.dart';
 import 'package:healtho_gym/core/theme/app_theme.dart';
 import 'package:healtho_gym/dashboard/app/dashboard_app.dart';
 import 'package:healtho_gym/features/splash/splash_screen.dart';
-import 'package:provider/provider.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:healtho_gym/core/services/one_signal_notification_service.dart';
 
@@ -27,21 +25,16 @@ void main() async {
 // Mobile application entry point
 void mainMobile() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   // تهيئة Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
   // تهيئة OneSignal
   _initOneSignal();
-
   // Initialize Preferences
   await AppPreferences().init();
-
   // Initialize ServiceLocator
   await ServiceLocator.init();
-
   runApp(
     const MyApp(),
   );
@@ -98,7 +91,7 @@ void mainDashboard() async {
   // runApp(const DashboardApp());
 
   // Instead, for now, show a message telling the user to use dashboard_main.dart
-  runApp(DashboardApp());
+  runApp(const DashboardApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -111,7 +104,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-
       locale: Locale('ar'),
       supportedLocales: const [
         Locale('ar'),

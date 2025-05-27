@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:healtho_gym/core/constant/font_manger.dart';
 import 'package:healtho_gym/core/constant/styles_manger.dart';
+import 'package:healtho_gym/core/theme/app_colors.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
@@ -44,7 +45,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: leading ??
           (automaticallyImplyLeading && Navigator.canPop(context)
               ? IconButton(
-                  icon: const Icon(Icons.arrow_back_ios , color: Colors.white,),
+                  icon: const Icon(Icons.arrow_back_ios , color: AppColors.secondary,),
                   onPressed: () => Navigator.pop(context),
                 )
               : null),

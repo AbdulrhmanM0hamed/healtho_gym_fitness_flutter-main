@@ -8,7 +8,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 class WorkoutExercisesDetailScreen extends StatefulWidget {
   final Exercise exercise;
   final VoidCallback? onToggleFavorite;
-  
+
   const WorkoutExercisesDetailScreen({
     super.key,
     required this.exercise,
@@ -23,33 +23,47 @@ class WorkoutExercisesDetailScreen extends StatefulWidget {
 class _WorkoutExercisesDetailScreenState
     extends State<WorkoutExercisesDetailScreen> {
   late bool _isFavorite;
-  
+
   @override
   void initState() {
     super.initState();
     _isFavorite = widget.exercise.isFavorite;
-    
+
     // Debug info
-    print('DEBUG: Exercise details - ID: ${widget.exercise.id}, Title: ${widget.exercise.title}');
+    print(
+        'DEBUG: Exercise details - ID: ${widget.exercise.id}, Title: ${widget.exercise.title}');
     print('DEBUG: Main image URL: ${widget.exercise.mainImageUrl}');
     print('DEBUG: Gallery image URLs: ${widget.exercise.imageUrl}');
   }
-  
+
   void _toggleFavorite() {
     setState(() {
       _isFavorite = !_isFavorite;
     });
     widget.onToggleFavorite?.call();
   }
-  
+
   void _openImageGallery(int initialIndex) {
-    final List<String> allImages = [
-      widget.exercise.mainImageUrl,
-      ...widget.exercise.imageUrl,
-    ].where((url) => url.isNotEmpty).toList();
+    // تجميع جميع الصور المتاحة (الرئيسية والمعرض) في قائمة واحدة
+    List<String> allImages = [];
+    
+    // إضافة الصورة الرئيسية إذا كانت موجودة
+    if (widget.exercise.mainImageUrl.isNotEmpty) {
+      allImages.add(widget.exercise.mainImageUrl);
+    }
+    
+    // إضافة صور المعرض إذا كانت موجودة
+    if (widget.exercise.imageUrl.isNotEmpty) {
+      // تأكد من عدم تكرار الصورة الرئيسية في صور المعرض
+      for (var img in widget.exercise.imageUrl) {
+        if (img.isNotEmpty && img != widget.exercise.mainImageUrl) {
+          allImages.add(img);
+        }
+      }
+    }
     
     if (allImages.isEmpty) return;
-    
+
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -60,17 +74,38 @@ class _WorkoutExercisesDetailScreenState
       ),
     );
   }
-  
+
   @override
   Widget build(BuildContext context) {
-    final hasGalleryImages = widget.exercise.imageUrl.isNotEmpty;
+    // تجميع جميع الصور المتاحة (الرئيسية والمعرض) في قائمة واحدة
+    List<String> allImages = [];
     
+    // إضافة الصورة الرئيسية إذا كانت موجودة
+    if (widget.exercise.mainImageUrl.isNotEmpty) {
+      allImages.add(widget.exercise.mainImageUrl);
+    }
+    
+    // إضافة صور المعرض إذا كانت موجودة
+    if (widget.exercise.imageUrl.isNotEmpty) {
+      // تأكد من عدم تكرار الصورة الرئيسية في صور المعرض
+      for (var img in widget.exercise.imageUrl) {
+        if (img.isNotEmpty && img != widget.exercise.mainImageUrl) {
+          allImages.add(img);
+        }
+      }
+    }
+    
+    // طباعة عدد الصور للتصحيح
+    print('DEBUG: Total images: ${allImages.length}');
+    for (int i = 0; i < allImages.length; i++) {
+      print('DEBUG: Image $i: ${allImages[i]}');
+    }
+    
+    final hasImages = allImages.isNotEmpty;
+
     return Scaffold(
       appBar: CustomAppBar(
-        backgroundColor: TColor.secondary,
-        centerTitle: false,
         title: widget.exercise.title,
-        titleColor: Colors.white,
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -78,24 +113,17 @@ class _WorkoutExercisesDetailScreenState
           children: [
             SizedBox(
               height: context.width * 0.4 + 40,
-              child: ListView.separated(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              child: hasImages
+                ? ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) {
-                    String imageUrl;
-                    
-                    try {
-                      // First show main image, then gallery images
-                      imageUrl = index == 0 
-                          ? widget.exercise.mainImageUrl 
-                          : widget.exercise.imageUrl[index - 1];
-                      
-                      print('DEBUG: Loading image at index $index: $imageUrl');
-                    } catch (e) {
-                      print('DEBUG: Error accessing image at index $index: $e');
+                    if (index >= allImages.length) {
                       return const SizedBox();
                     }
+                    
+                    String imageUrl = allImages[index];
+                    print('DEBUG: Loading image at index $index: $imageUrl');
                     
                     if (imageUrl.isEmpty) {
                       print('DEBUG: Empty image URL at index $index');
@@ -115,39 +143,40 @@ class _WorkoutExercisesDetailScreenState
                         ),
                       );
                     }
-                        
+
                     return GestureDetector(
                       onTap: () => _openImageGallery(index),
                       child: ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: CachedNetworkImage(
-                        imageUrl: imageUrl,
-                        width: context.width * 0.7,
-                        height: context.width * 0.4,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(
+                        borderRadius: BorderRadius.circular(15),
+                        child: CachedNetworkImage(
+                          imageUrl: imageUrl,
                           width: context.width * 0.7,
                           height: context.width * 0.4,
-                          color: Colors.grey[300],
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              color: TColor.primary,
-                            ),
-                          ),
-                        ),
-                        errorWidget: (context, url, error) {
-                          print('DEBUG: Error loading image: $url, Error: $error');
-                          return Container(
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Container(
                             width: context.width * 0.7,
                             height: context.width * 0.4,
                             color: Colors.grey[300],
-                            child: const Icon(
-                              Icons.broken_image,
-                              size: 40,
-                              color: Colors.grey,
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: TColor.primary,
+                              ),
                             ),
-                          );
-                        },
+                          ),
+                          errorWidget: (context, url, error) {
+                            print(
+                                'DEBUG: Error loading image: $url, Error: $error');
+                            return Container(
+                              width: context.width * 0.7,
+                              height: context.width * 0.4,
+                              color: Colors.grey[300],
+                              child: const Icon(
+                                Icons.broken_image,
+                                size: 40,
+                                color: Colors.grey,
+                              ),
+                            );
+                          },
                         ),
                       ),
                     );
@@ -155,7 +184,24 @@ class _WorkoutExercisesDetailScreenState
                   separatorBuilder: (context, index) => const SizedBox(
                         width: 20,
                       ),
-                  itemCount: hasGalleryImages ? 1 + widget.exercise.imageUrl.length : 1),
+                  itemCount: allImages.length,
+                )
+                : Container(
+                    width: context.width * 0.7,
+                    height: context.width * 0.4,
+                    margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.image_not_supported,
+                        size: 40,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
@@ -176,7 +222,7 @@ class _WorkoutExercisesDetailScreenState
                   Text(
                     widget.exercise.description,
                     style: TextStyle(
-                      color: TColor.primaryText,
+                      color: TColor.secondaryText,
                       fontSize: 13,
                     ),
                   ),

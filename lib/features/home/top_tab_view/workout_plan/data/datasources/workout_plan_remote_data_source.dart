@@ -1,11 +1,6 @@
 import 'dart:developer' as dev;
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:healtho_gym/core/utils/constants.dart';
-import 'package:healtho_gym/features/home/top_tab_view/workout_plan/data/models/workout_plan_model.dart';
-import 'package:healtho_gym/features/home/top_tab_view/workout_plan/data/models/workout_week_model.dart';
-import 'package:healtho_gym/features/home/top_tab_view/workout_plan/data/models/workout_day_model.dart';
-import 'package:healtho_gym/features/home/top_tab_view/workout_plan/data/models/day_exercise_model.dart';
-import 'package:healtho_gym/core/services/supabase_service.dart';
+
 
 class WorkoutPlanRemoteDataSource {
   final SupabaseClient _supabase;
@@ -174,6 +169,7 @@ class WorkoutPlanRemoteDataSource {
               title,
               description,
               main_image_url,
+              image_url,
               level
             )
           ''')
@@ -186,10 +182,15 @@ class WorkoutPlanRemoteDataSource {
       List<Map<String, dynamic>> formattedResponse = [];
       for (var item in response) {
         if (item['exercises'] != null) {
-          // Create a copy of the exercise data with renamed image field
+          // Create a copy of the exercise data
           Map<String, dynamic> exerciseData = Map.from(item['exercises']);
-          // Add image_url field based on main_image_url
-          exerciseData['image_url'] = exerciseData['main_image_url'];
+          
+          // إذا كان حقل image_url غير موجود أو فارغ، نستخدم main_image_url
+          // لكن لا نقوم بتعيين image_url إذا كان موجودًا بالفعل لتجنب التكرار
+          if (!exerciseData.containsKey('image_url') || exerciseData['image_url'] == null || 
+              (exerciseData['image_url'] is String && (exerciseData['image_url'] as String).isEmpty)) {
+            exerciseData['image_url'] = [];
+          }
           
           // Create a copy of the original item and replace exercises with our modified version
           Map<String, dynamic> newItem = Map.from(item);

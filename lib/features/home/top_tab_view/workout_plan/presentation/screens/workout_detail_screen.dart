@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:healtho_gym/common/color_extension.dart';
+import 'package:healtho_gym/common/custom_app_bar.dart';
 import 'package:healtho_gym/core/di/service_locator.dart';
 import 'package:healtho_gym/features/home/top_tab_view/workout_plan/presentation/screens/week_detail_screen.dart';
 import 'package:healtho_gym/features/home/top_tab_view/workout_plan/presentation/screens/workout_introductions_screen.dart';
@@ -27,24 +28,8 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen> {
       child: BlocBuilder<WorkoutPlanCubit, WorkoutPlanState>(
         builder: (context, state) {
           return Scaffold(
-            appBar: AppBar(
-              leading: IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: Image.asset(
-                  "assets/img/back.png",
-                  width: 20,
-                  height: 20,
-                  color: Colors.white,
-                ),
-              ),
-              backgroundColor: TColor.secondary,
-              centerTitle: false,
-              title: Text(
-                state is WorkoutPlanDetailsLoaded ? state.plan.title : "Workout Plan",
-                style: const TextStyle(color: Colors.white),
-              ),
+            appBar: const CustomAppBar(
+              title: "Workout Plan",
             ),
             body: _buildBody(state),
           );

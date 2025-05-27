@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:healtho_gym/common/color_extension.dart';
+import 'package:healtho_gym/common/custom_app_bar.dart';
+import 'package:healtho_gym/common_widget/round_button.dart';
 import 'package:healtho_gym/core/di/service_locator.dart';
+import 'package:healtho_gym/core/theme/app_colors.dart';
 import 'package:healtho_gym/features/home/top_tab_view/workout_plan/presentation/screens/day_exercises_screen.dart';
 import 'package:healtho_gym/features/home/top_tab_view/workout_plan/presentation/viewmodels/workout_plan_cubit.dart';
 import 'dart:ui';
@@ -27,92 +30,18 @@ class _WeekDetailsScreenState extends State<WeekDetailsScreen> {
         builder: (context, state) {
           return Scaffold(
             extendBodyBehindAppBar: true,
-            appBar: AppBar(
-              elevation: 0,
-              backgroundColor: Colors.transparent,
-              flexibleSpace: ClipRect(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                  child: Container(
-                    color: TColor.secondary.withOpacity(0.7),
-                  ),
-                ),
-              ),
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(
-                  bottom: Radius.circular(20),
-                ),
-              ),
-              leading: IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: Image.asset(
-                  "assets/img/back.png",
-                  width: 20,
-                  height: 20,
-                  color: Colors.white,
-                ),
-              ),
-              centerTitle: false,
-              title: Text(
-                state is WorkoutWeekDaysLoaded
+            appBar: CustomAppBar(
+              title:  state is WorkoutWeekDaysLoaded
                     ? "Week ${state.week.weekNumber} Training"
                     : "Week Training",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Tooltip(
-                    message: "Weekly Progress",
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(30),
-                        onTap: () {
-                          // TODO: Show weekly progress stats
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Weekly progress stats coming soon!')),
-                          );
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.insights, color: Colors.white, size: 22),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
             ),
-            body: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    TColor.secondary.withOpacity(0.3),
-                    Colors.white,
-                  ],
-                ),
-              ),
-              child: _buildBody(state),
-            ),
+            body: _buildBody(state),
           );
         },
       ),
     );
   }
-  
+
   Widget _buildBody(WorkoutPlanState state) {
     if (state is WorkoutPlanLoading) {
       return const Center(
@@ -150,8 +79,10 @@ class _WeekDetailsScreenState extends State<WeekDetailsScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: TColor.secondary,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
               ),
             ),
           ],
@@ -163,13 +94,6 @@ class _WeekDetailsScreenState extends State<WeekDetailsScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(
-                "assets/img/placeholder-exercise.png", // استخدم صورة مناسبة هنا
-                width: 120,
-                height: 120,
-                color: Colors.grey[400],
-              ),
-              const SizedBox(height: 24),
               const Text(
                 'لا توجد أيام تمرين متاحة لهذا الأسبوع.',
                 textAlign: TextAlign.center,
@@ -179,27 +103,21 @@ class _WeekDetailsScreenState extends State<WeekDetailsScreen> {
               const Text(
                 'الرجاء المحاولة مرة أخرى لاحقاً.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.grey),
+                style: TextStyle(fontSize: 14, color: AppColors.secondary),
               ),
               const SizedBox(height: 24),
-              ElevatedButton.icon(
+              RoundButton(
+                title: "العودة",
+                type: RoundButtonType.primary,
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                icon: const Icon(Icons.arrow_back),
-                label: const Text('العودة'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: TColor.secondary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
               ),
             ],
           ),
         );
       }
-      
+
       // عرض معلومات الأسبوع في الأعلى
       return Column(
         children: [
@@ -209,7 +127,8 @@ class _WeekDetailsScreenState extends State<WeekDetailsScreen> {
             child: Card(
               elevation: 8,
               shadowColor: Colors.black26,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
@@ -223,7 +142,8 @@ class _WeekDetailsScreenState extends State<WeekDetailsScreen> {
                             color: TColor.secondary.withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(Icons.calendar_today, color: TColor.secondary, size: 24),
+                          child: Icon(Icons.calendar_today,
+                              color: TColor.secondary, size: 24),
                         ),
                         const SizedBox(width: 12),
                         Column(
@@ -231,28 +151,34 @@ class _WeekDetailsScreenState extends State<WeekDetailsScreen> {
                           children: [
                             Text(
                               "Week ${state.week.weekNumber}",
-                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              style: const TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold),
                             ),
                             Text(
                               "${state.days.length} training days",
-                              style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                              style: TextStyle(
+                                  color: Colors.grey[600], fontSize: 14),
                             ),
                           ],
                         ),
                         const Spacer(),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: TColor.secondary.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Row(
                             children: [
-                              Icon(Icons.fitness_center, color: TColor.secondary, size: 16),
+                              Icon(Icons.fitness_center,
+                                  color: TColor.secondary, size: 16),
                               const SizedBox(width: 4),
                               Text(
                                 "${state.days.fold(0, (sum, day) => sum + day.totalExercises)} exercises",
-                                style: TextStyle(color: TColor.secondary, fontWeight: FontWeight.w500),
+                                style: TextStyle(
+                                    color: TColor.secondary,
+                                    fontWeight: FontWeight.w500),
                               ),
                             ],
                           ),
@@ -264,7 +190,7 @@ class _WeekDetailsScreenState extends State<WeekDetailsScreen> {
               ),
             ),
           ),
-          
+
           // قائمة أيام التمرين
           Expanded(
             child: ListView.separated(
@@ -280,7 +206,7 @@ class _WeekDetailsScreenState extends State<WeekDetailsScreen> {
         ],
       );
     }
-    
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -304,11 +230,11 @@ class _WeekDetailsScreenState extends State<WeekDetailsScreen> {
       ),
     );
   }
-  
+
   // بطاقة يوم تمرين محسنة
   Widget _buildDayCard(dynamic day) {
     final bool isRestDay = day.isRestDay;
-    
+
     return Card(
       elevation: 5,
       shadowColor: Colors.black26,
@@ -353,17 +279,20 @@ class _WeekDetailsScreenState extends State<WeekDetailsScreen> {
                       children: [
                         Text(
                           day.dayName,
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         if (isRestDay)
                           Text(
                             "Rest Day - Recovery",
-                            style: TextStyle(color: Colors.blue[700], fontSize: 14),
+                            style: TextStyle(
+                                color: Colors.blue[700], fontSize: 14),
                           )
                         else
                           Text(
                             "${day.totalExercises} exercises",
-                            style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                            style: TextStyle(
+                                color: Colors.grey[600], fontSize: 14),
                           ),
                       ],
                     ),
@@ -379,7 +308,7 @@ class _WeekDetailsScreenState extends State<WeekDetailsScreen> {
                     ),
                 ],
               ),
-              if (!isRestDay) ...[  
+              if (!isRestDay) ...[
                 const SizedBox(height: 12),
                 const Divider(),
                 const SizedBox(height: 8),
@@ -405,7 +334,7 @@ class _WeekDetailsScreenState extends State<WeekDetailsScreen> {
       ),
     );
   }
-  
+
   // معلومات نوع التمرين (رئيسي/ثانوي)
   Widget _buildExerciseTypeInfo(String label, int count, Color color) {
     return Row(
