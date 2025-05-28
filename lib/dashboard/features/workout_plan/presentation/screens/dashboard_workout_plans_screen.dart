@@ -39,7 +39,7 @@ class _DashboardWorkoutPlansScreenState
     // إضافة مستمع للبحث
     _searchController.addListener(_onSearchChanged);
   }
-  
+
   // دالة مستقلة لتحميل خطط التمرين
   void _loadWorkoutPlans() {
     if (mounted) {
@@ -154,8 +154,8 @@ class _DashboardWorkoutPlansScreenState
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddWorkoutPlanDialog(context),
         backgroundColor: WorkoutPlanTheme.primaryColor,
-        child: const Icon(Icons.add),
         tooltip: 'إضافة خطة تمرين جديدة',
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -163,7 +163,7 @@ class _DashboardWorkoutPlansScreenState
   Widget _buildSearchBar() {
     return Container(
       padding: const EdgeInsets.all(16),
-      color: WorkoutPlanTheme.primaryColor.withOpacity(0.05),
+      color: WorkoutPlanTheme.primaryColor.withValues(alpha: 0.05),
       child: TextField(
         controller: _searchController,
         decoration: InputDecoration(

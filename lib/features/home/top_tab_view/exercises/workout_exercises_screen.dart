@@ -343,14 +343,9 @@ class _ImageGalleryPreviewState extends State<ImageGalleryPreview> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: Text(
-          '${_currentIndex + 1}/${widget.images.length}',
-          style: const TextStyle(color: Colors.white),
+      appBar: CustomAppBar(
+        title: '${_currentIndex + 1}/${widget.images.length}',
         ),
-      ),
       body: PageView.builder(
         controller: _pageController,
         itemCount: widget.images.length,

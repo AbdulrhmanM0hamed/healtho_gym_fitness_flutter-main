@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:healtho_gym/common/color_extension.dart';
 import 'package:healtho_gym/common/custom_app_bar.dart';
+import 'package:healtho_gym/core/theme/app_colors.dart';
 import 'package:healtho_gym/features/home/top_tab_view/exercises/presentation/widgets/exercises_card.dart';
 import 'package:healtho_gym/features/home/top_tab_view/exercises/presentation/cubits/exercises_cubit.dart';
 import 'package:healtho_gym/features/home/top_tab_view/exercises/workout_exercises_screen.dart';
@@ -30,12 +31,12 @@ class _ExercisesNameScreenState extends State<ExercisesNameScreen> {
         builder: (context, state) {
           return Scaffold(
             appBar: CustomAppBar(
-              backgroundColor: TColor.secondary,
-              centerTitle: false,
+             backgroundColor: TColor.secondary,
+             leading: const Icon(Icons.arrow_back_ios_new , color: AppColors.white),
               title: state is ExercisesLoaded && state.category != null
                   ? state.category!.titleAr
                   : 'تمارين',
-              titleColor: Colors.white,
+           titleColor: AppColors.white,
             ),
             body: Column(
               children: [
