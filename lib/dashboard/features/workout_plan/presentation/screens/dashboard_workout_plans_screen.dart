@@ -34,10 +34,17 @@ class _DashboardWorkoutPlansScreenState
     // إنشاء متحكم التبويبات
     _tabController = TabController(length: 3, vsync: this);
     // تحميل خطط التمرين عند بدء الشاشة
-    context.read<DashboardWorkoutPlanCubit>().getAllWorkoutPlans();
+    _loadWorkoutPlans();
 
     // إضافة مستمع للبحث
     _searchController.addListener(_onSearchChanged);
+  }
+  
+  // دالة مستقلة لتحميل خطط التمرين
+  void _loadWorkoutPlans() {
+    if (mounted) {
+      context.read<DashboardWorkoutPlanCubit>().getAllWorkoutPlans();
+    }
   }
 
   void _onSearchChanged() {
@@ -252,7 +259,12 @@ class _DashboardWorkoutPlansScreenState
                               planId: plan.id!),
                         ),
                       ),
-                    );
+                    ).then((_) {
+                      // إعادة تحميل البيانات عند العودة من شاشة التفاصيل
+                      if (mounted) {
+                        cubit.getAllWorkoutPlans();
+                      }
+                    });
                   },
                   onEdit: () => _showEditWorkoutPlanDialog(context, plan),
                   onDelete: () => _confirmDeleteWorkoutPlan(context, plan),
