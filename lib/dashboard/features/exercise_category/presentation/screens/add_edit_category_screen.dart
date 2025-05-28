@@ -28,12 +28,16 @@ class _AddEditCategoryScreenState extends State<AddEditCategoryScreen> {
   final _titleController = TextEditingController();
   File? _imageFile;
   bool _isLoading = false;
+  late ExerciseCategoryCubit _categoryCubit;
 
   bool get _isEditing => widget.category != null;
 
   @override
   void initState() {
     super.initState();
+    // تهيئة الـ cubit في initState للتأكد من توفره قبل استخدامه
+    _categoryCubit = sl<ExerciseCategoryCubit>();
+    
     if (_isEditing) {
       _titleArController.text = widget.category!.titleAr;
       _titleController.text = widget.category!.title;
@@ -44,6 +48,7 @@ class _AddEditCategoryScreenState extends State<AddEditCategoryScreen> {
   void dispose() {
     _titleArController.dispose();
     _titleController.dispose();
+    // لا نحتاج إلى إغلاق _categoryCubit هنا لأنه يتم إدارته بواسطة service locator
     super.dispose();
   }
 
@@ -70,10 +75,9 @@ class _AddEditCategoryScreenState extends State<AddEditCategoryScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final cubit = context.read<ExerciseCategoryCubit>();
-
+      // استخدام الـ cubit الذي تم تهيئته في initState
       if (_isEditing) {
-        await cubit.updateCategory(
+        await _categoryCubit.updateCategory(
           widget.category!.copyWith(
             titleAr: _titleArController.text,
             title: _titleController.text,
@@ -81,7 +85,7 @@ class _AddEditCategoryScreenState extends State<AddEditCategoryScreen> {
           image: _imageFile,
         );
       } else {
-        await cubit.addCategory(
+        await _categoryCubit.addCategory(
           titleAr: _titleArController.text,
           title: _titleController.text,
           image: _imageFile!,
@@ -106,8 +110,8 @@ class _AddEditCategoryScreenState extends State<AddEditCategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => sl<ExerciseCategoryCubit>(),
+    return BlocProvider.value(
+      value: _categoryCubit, // استخدام الـ cubit الموجود بدلاً من إنشاء واحد جديد
       child: Scaffold(
         backgroundColor: Colors.grey[100],
         appBar: CustomAppBar(

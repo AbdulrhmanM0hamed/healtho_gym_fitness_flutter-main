@@ -5,7 +5,10 @@ import 'package:healtho_gym/common/custom_app_bar.dart';
 import 'package:healtho_gym/core/theme/app_colors.dart';
 import 'package:healtho_gym/features/home/top_tab_view/exercises/presentation/widgets/exercises_card.dart';
 import 'package:healtho_gym/features/home/top_tab_view/exercises/presentation/cubits/exercises_cubit.dart';
+import 'package:healtho_gym/features/home/top_tab_view/exercises/presentation/cubits/custom_exercises_cubit.dart';
+import 'package:healtho_gym/features/home/top_tab_view/exercises/presentation/screens/custom_exercises_list_screen.dart';
 import 'package:healtho_gym/features/home/top_tab_view/exercises/workout_exercises_screen.dart';
+import 'package:healtho_gym/core/di/service_locator.dart';
 
 class ExercisesNameScreen extends StatefulWidget {
   const ExercisesNameScreen({super.key});
@@ -23,6 +26,22 @@ class _ExercisesNameScreenState extends State<ExercisesNameScreen> {
     // ✅ الحصول على Cubit بعد بناء السياق
     _exercisesCubit = BlocProvider.of<ExercisesCubit>(context);
   }
+  
+  // الانتقال إلى شاشة التمارين المخصصة
+  void _navigateToCustomExercises(category, int level) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BlocProvider(
+          create: (context) => sl<CustomExercisesCubit>(),
+          child: CustomExercisesListScreen(
+            category: category,
+            level: level,
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,12 +50,23 @@ class _ExercisesNameScreenState extends State<ExercisesNameScreen> {
         builder: (context, state) {
           return Scaffold(
             appBar: CustomAppBar(
-             backgroundColor: TColor.secondary,
-             leading: const Icon(Icons.arrow_back_ios_new , color: AppColors.white),
+             backgroundColor: AppColors.secondary,
+             leading: IconButton(onPressed: (){
+              Navigator.pop(context);
+             }, icon:const Icon(Icons.arrow_back_ios_new , color: AppColors.white),),
               title: state is ExercisesLoaded && state.category != null
                   ? state.category!.titleAr
                   : 'تمارين',
-           titleColor: AppColors.white,
+             titleColor: AppColors.white,
+             actions: [
+               // زر التمارين المخصصة
+               if (state is ExercisesLoaded && state.category != null)
+                 IconButton(
+                   icon: const Icon(Icons.fitness_center, color: AppColors.white),
+                   tooltip: 'التمارين المخصصة',
+                   onPressed: () => _navigateToCustomExercises(state.category!, state.selectedLevel),
+                 ),
+             ],
             ),
             body: Column(
               children: [

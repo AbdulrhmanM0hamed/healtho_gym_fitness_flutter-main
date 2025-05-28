@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:healtho_gym/core/hive/hive_init.dart';
 import 'package:healtho_gym/firebase_options.dart';
 import 'package:healtho_gym/core/di/service_locator.dart';
 import 'package:healtho_gym/core/locale/app_localizations.dart';
@@ -33,8 +34,11 @@ void mainMobile() async {
   _initOneSignal();
   // Initialize Preferences
   await AppPreferences().init();
+  // تهيئة Hive للتخزين المحلي
+  await HiveInit.init();
   // Initialize ServiceLocator
   await ServiceLocator.init();
+
   runApp(
     const MyApp(),
   );

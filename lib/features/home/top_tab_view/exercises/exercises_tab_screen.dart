@@ -11,14 +11,26 @@ class ExercisesScreen extends StatefulWidget {
   State<ExercisesScreen> createState() => _ExercisesScreenState();
 }
 
-class _ExercisesScreenState extends State<ExercisesScreen> {
+class _ExercisesScreenState extends State<ExercisesScreen> with AutomaticKeepAliveClientMixin {
   late ExercisesCategoryCubit _categoryCubit;
+  bool _isInitialized = false;
+
+  @override
+  bool get wantKeepAlive => true; // للحفاظ على حالة الشاشة
 
   @override
   void initState() {
     super.initState();
     _categoryCubit = sl<ExercisesCategoryCubit>();
-    _categoryCubit.loadCategories();
+    _loadCategoriesIfNeeded();
+  }
+  
+  void _loadCategoriesIfNeeded() {
+    // تحميل البيانات فقط في المرة الأولى
+    if (!_isInitialized) {
+      _categoryCubit.loadCategories();
+      _isInitialized = true;
+    }
   }
 
   @override
@@ -28,9 +40,12 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // مطلوب بسبب AutomaticKeepAliveClientMixin
+    
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: () async {
+          // إعادة تحميل البيانات عند السحب للتحديث
           await _categoryCubit.loadCategories();
         },
         child: BlocBuilder<ExercisesCategoryCubit, ExercisesCategoryState>(

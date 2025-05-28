@@ -80,9 +80,20 @@ class ExercisesCategoryCard extends StatelessWidget {
         width: double.maxFinite,
         height: double.maxFinite,
         fit: BoxFit.fill,
-        placeholder: (context, url) => Center(
-          child: CircularProgressIndicator(
-            color: TColor.primary,
+        fadeInDuration: const Duration(milliseconds: 150),
+        fadeOutDuration: const Duration(milliseconds: 150),
+        memCacheWidth: 500, 
+        placeholder: (context, url) => Container(
+          color: Colors.grey[200],
+          child: Center(
+            child: SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.0,
+                color: TColor.primary,
+              ),
+            ),
           ),
         ),
         errorWidget: (context, url, error) => Container(
@@ -97,12 +108,8 @@ class ExercisesCategoryCard extends StatelessWidget {
         imagePath,
         width: double.maxFinite,
         height: double.maxFinite,
-        fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) => Container(
-          color: Colors.grey[300],
-          alignment: Alignment.center,
-          child: const Icon(Icons.image_not_supported, size: 40),
-        ),
+        fit: BoxFit.fill,
+        cacheWidth: 500, 
       );
     }
   }

@@ -14,6 +14,8 @@ import 'package:healtho_gym/dashboard/features/workout_plan/presentation/viewmod
 import 'package:healtho_gym/features/home/top_tab_view/exercises/data/repositories/exercise_repository.dart';
 import 'package:healtho_gym/features/home/top_tab_view/exercises/presentation/cubits/exercises_category_cubit.dart';
 import 'package:healtho_gym/features/home/top_tab_view/exercises/presentation/cubits/exercises_cubit.dart';
+import 'package:healtho_gym/features/home/top_tab_view/exercises/data/datasources/custom_exercise_local_datasource.dart';
+import 'package:healtho_gym/features/home/top_tab_view/exercises/presentation/cubits/custom_exercises_cubit.dart';
 import 'package:healtho_gym/features/login/data/repositories/auth_repository.dart';
 import 'package:healtho_gym/features/login/data/repositories/user_profile_repository.dart';
 import 'package:healtho_gym/core/services/auth_service.dart';
@@ -25,7 +27,6 @@ import 'package:healtho_gym/features/login/presentation/viewmodels/auth_cubit/au
 import 'package:healtho_gym/features/login/presentation/viewmodels/user_profile_cubit/profile_cubit.dart';
 import 'package:healtho_gym/features/home/top_tab_view/health_tip/data/repositories/health_tip_repository.dart';
 import 'package:healtho_gym/features/home/top_tab_view/health_tip/presentation/viewmodels/health_tip_cubit.dart';
-import 'package:healtho_gym/dashboard/features/health_tip/presentation/viewmodels/health_tip_cubit.dart' as dashboard;
 import 'package:healtho_gym/core/services/one_signal_notification_service.dart';
 import 'package:healtho_gym/core/services/storage_service.dart';
 import 'package:healtho_gym/features/home/top_tab_view/workout_plan/data/datasources/workout_plan_remote_data_source.dart';
@@ -84,9 +85,13 @@ class ServiceLocator {
     sl.registerFactory<dashboard_health_tip_cubit.HealthTipCubit>(() => dashboard_health_tip_cubit.HealthTipCubit());
     sl.registerFactory<UserManagementCubit>(() => UserManagementCubit());
 
-    // Exercise cubits (mobile app)
-    sl.registerFactory<ExercisesCategoryCubit>(() => ExercisesCategoryCubit(sl()));
+    // Exercises
     sl.registerFactory<ExercisesCubit>(() => ExercisesCubit(sl()));
+    sl.registerFactory<ExercisesCategoryCubit>(() => ExercisesCategoryCubit(sl()));
+    
+    // Custom Exercises
+    sl.registerLazySingleton<CustomExerciseLocalDataSource>(() => CustomExerciseLocalDataSource());
+    sl.registerFactory<CustomExercisesCubit>(() => CustomExercisesCubit(sl(), sl()));
 
     // Exercise cubits (dashboard)
     sl.registerFactory<ExerciseCategoryCubit>(() => ExerciseCategoryCubit(sl(), sl<StorageService>()));
