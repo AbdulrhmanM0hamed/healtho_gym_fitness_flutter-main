@@ -47,6 +47,27 @@ class _ChallengesScreenState extends State<ChallengesScreen> {
     },
   ];
 
+  // دالة لتحليل عدد الأسابيع بشكل آمن
+  int _parseWeekCount(String? subtitle) {
+    if (subtitle == null || subtitle.isEmpty) {
+      return 0;
+    }
+    
+    // استخراج الجزء الأول من النص (قبل كلمة Week)
+    final parts = subtitle.split(" ");
+    if (parts.isEmpty) {
+      return 0;
+    }
+    
+    // محاولة تحويل النص إلى رقم
+    try {
+      return int.parse(parts.first);
+    } catch (e) {
+      // إذا لم يكن رقمًا، نرجع قيمة افتراضية
+      return 4; // قيمة افتراضية لعدد الأسابيع
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,9 +83,9 @@ class _ChallengesScreenState extends State<ChallengesScreen> {
   final ExerciseCategory obj = ExerciseCategory(
     id: 1,
     title: data["title"] ?? "",
-    titleAr: data["titleAr"] ?? "",
+    titleAr: data["title"] ?? "", // استخدام title كقيمة لـ titleAr لعرض العنوان
     imageUrl: data["image"] ?? "",
-    exercisesCount: data["exercisesCount"] ?? 0,
+    exercisesCount: _parseWeekCount(data["subtitle"]), // استخراج عدد الأسابيع بشكل آمن
     createdAt: DateTime.now(),
     updatedAt: DateTime.now(),
   );

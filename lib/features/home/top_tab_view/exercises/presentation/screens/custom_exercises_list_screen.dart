@@ -25,10 +25,12 @@ class CustomExercisesListScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<CustomExercisesListScreen> createState() => _CustomExercisesListScreenState();
+  State<CustomExercisesListScreen> createState() =>
+      _CustomExercisesListScreenState();
 }
 
-class _CustomExercisesListScreenState extends State<CustomExercisesListScreen> with AutomaticKeepAliveClientMixin {
+class _CustomExercisesListScreenState extends State<CustomExercisesListScreen>
+    with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
@@ -39,13 +41,15 @@ class _CustomExercisesListScreenState extends State<CustomExercisesListScreen> w
   }
 
   void _loadExercises() {
-    context.read<CustomExercisesCubit>().loadExercises(widget.category, widget.level);
+    context
+        .read<CustomExercisesCubit>()
+        .loadExercises(widget.category, widget.level);
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    
+
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: CustomAppBar(
@@ -106,7 +110,7 @@ class _CustomExercisesListScreenState extends State<CustomExercisesListScreen> w
 
   Widget _buildExercisesList(CustomExercisesLoaded state) {
     final customExercises = state.customExercises;
-    
+
     // إذا لم تكن هناك تمارين مخصصة
     if (customExercises.isEmpty) {
       return Center(
@@ -119,20 +123,24 @@ class _CustomExercisesListScreenState extends State<CustomExercisesListScreen> w
                 color: Colors.grey[200],
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.fitness_center, size: 80, color: TColor.primary),
+              child:
+                  Icon(Icons.fitness_center, size: 80, color: TColor.primary),
             ),
             const SizedBox(height: 24),
             Text(
               'لا توجد تمارين مخصصة',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: TColor.secondary),
+              style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: TColor.secondary),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 40),
               child: Text(
                 'قم بإنشاء تمارينك الخاصة لتتبع تقدمك وتخصيص خطة تمارينك',
-                style: const TextStyle(fontSize: 16, color: Colors.grey),
+                style: TextStyle(fontSize: 16, color: Colors.grey),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -144,8 +152,10 @@ class _CustomExercisesListScreenState extends State<CustomExercisesListScreen> w
               style: ElevatedButton.styleFrom(
                 backgroundColor: TColor.primary,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30)),
               ),
             ),
           ],
@@ -155,7 +165,7 @@ class _CustomExercisesListScreenState extends State<CustomExercisesListScreen> w
 
     // إنشاء قائمة من التمارين المخصصة فقط
     final List<Widget> exerciseWidgets = [];
-    
+
     // إضافة عنوان للتمارين المخصصة
     exerciseWidgets.add(
       Padding(
@@ -182,12 +192,12 @@ class _CustomExercisesListScreenState extends State<CustomExercisesListScreen> w
         ),
       ),
     );
-    
+
     // إضافة التمارين المخصصة
     for (final exercise in customExercises) {
       exerciseWidgets.add(_buildCustomExerciseCard(exercise));
     }
-    
+
     return ListView(
       padding: const EdgeInsets.all(16),
       children: exerciseWidgets,
@@ -209,7 +219,8 @@ class _CustomExercisesListScreenState extends State<CustomExercisesListScreen> w
           children: [
             // صورة التمرين
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(12)),
               child: SizedBox(
                 height: 180,
                 width: double.infinity,
@@ -232,7 +243,7 @@ class _CustomExercisesListScreenState extends State<CustomExercisesListScreen> w
                       ),
               ),
             ),
-            
+
             // معلومات التمرين
             Padding(
               padding: const EdgeInsets.all(16),
@@ -272,14 +283,16 @@ class _CustomExercisesListScreenState extends State<CustomExercisesListScreen> w
                           const SizedBox(width: 8),
                           // علامة تمرين مخصص
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
                               color: TColor.primary.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Row(
                               children: [
-                                Icon(Icons.edit, size: 16, color: TColor.primary),
+                                Icon(Icons.edit,
+                                    size: 16, color: TColor.primary),
                                 const SizedBox(width: 4),
                                 Text(
                                   'مخصص',
@@ -307,9 +320,11 @@ class _CustomExercisesListScreenState extends State<CustomExercisesListScreen> w
                     ),
                   ),
                   const SizedBox(height: 12),
-                  
+
                   // معلومات الوزن والتكرارات
-                  if (exercise.lastWeight > 0 || exercise.lastReps > 0 || exercise.lastSets > 0)
+                  if (exercise.lastWeight > 0 ||
+                      exercise.lastReps > 0 ||
+                      exercise.lastSets > 0)
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
@@ -385,7 +400,7 @@ class _CustomExercisesListScreenState extends State<CustomExercisesListScreen> w
       imageUrl: exercise.originalGalleryImages,
       level: exercise.level,
     );
-    
+
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -398,14 +413,14 @@ class _CustomExercisesListScreenState extends State<CustomExercisesListScreen> w
         ),
       ),
     );
-    
+
     if (result == true) {
       _loadExercises();
     }
   }
 
   // تم إزالة دالة _navigateToCustomizeExercise لأنها لم تعد مستخدمة
-  
+
   // عرض مربع حوار تأكيد الحذف
   void _showDeleteConfirmation(CustomExercise exercise) {
     showDialog(
@@ -451,7 +466,7 @@ class _CustomExercisesListScreenState extends State<CustomExercisesListScreen> w
       ),
     );
   }
-  
+
   // حذف التمرين المخصص
   void _deleteCustomExercise(CustomExercise exercise) async {
     try {
@@ -459,20 +474,20 @@ class _CustomExercisesListScreenState extends State<CustomExercisesListScreen> w
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('جاري حذف التمرين...')),
       );
-      
+
       // حذف التمرين باستخدام Cubit
       await context.read<CustomExercisesCubit>().deleteCustomExercise(
-        exercise.id,
-        exercise.localImagePath,
-      );
-      
+            exercise.id,
+            exercise.localImagePath,
+          );
+
       // عرض رسالة نجاح
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('تم حذف التمرين بنجاح')),
         );
       }
-      
+
       // إعادة تحميل التمارين
       _loadExercises();
     } catch (e) {
@@ -483,7 +498,7 @@ class _CustomExercisesListScreenState extends State<CustomExercisesListScreen> w
       }
     }
   }
-  
+
   // إنشاء تمرين جديد من الصفر
   void _createNewExercise() async {
     // إنشاء تمرين فارغ كقالب
@@ -499,7 +514,7 @@ class _CustomExercisesListScreenState extends State<CustomExercisesListScreen> w
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
-    
+
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -512,7 +527,7 @@ class _CustomExercisesListScreenState extends State<CustomExercisesListScreen> w
         ),
       ),
     );
-    
+
     if (result == true) {
       _loadExercises();
     }
