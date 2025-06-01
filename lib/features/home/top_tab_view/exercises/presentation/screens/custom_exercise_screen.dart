@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:healtho_gym/common_widget/round_button.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:healtho_gym/common/color_extension.dart';
 import 'package:healtho_gym/core/theme/app_colors.dart';
@@ -359,33 +360,39 @@ class _CustomExerciseScreenState extends State<CustomExerciseScreen> {
                               ],
                             ),
                             const SizedBox(height: 16),
-                            Row(
+                            // استخدام Column بدلاً من Row لعرض الحقول بشكل عمودي
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(
-                                  child: _buildTextField(
-                                    controller: _weightController,
-                                    label: 'الوزن (كجم)',
-                                    icon: Icons.fitness_center,
-                                    keyboardType: TextInputType.number,
-                                  ),
+                                // صف الوزن والتكرارات
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _buildCompactTextField(
+                                        controller: _weightController,
+                                        label: 'الوزن',
+                                        icon: Icons.fitness_center,
+                                        keyboardType: TextInputType.number,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: _buildCompactTextField(
+                                        controller: _repsController,
+                                        label: 'التكرارات',
+                                        icon: Icons.repeat,
+                                        keyboardType: TextInputType.number,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: _buildTextField(
-                                    controller: _repsController,
-                                    label: 'التكرارات',
-                                    icon: Icons.repeat,
-                                    keyboardType: TextInputType.number,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: _buildTextField(
-                                    controller: _setsController,
-                                    label: 'المجموعات',
-                                    icon: Icons.format_list_numbered,
-                                    keyboardType: TextInputType.number,
-                                  ),
+                                const SizedBox(height: 12),
+                                // صف المجموعات
+                                _buildCompactTextField(
+                                  controller: _setsController,
+                                  label: 'المجموعات',
+                                  icon: Icons.format_list_numbered,
+                                  keyboardType: TextInputType.number,
                                 ),
                               ],
                             ),
@@ -404,24 +411,9 @@ class _CustomExerciseScreenState extends State<CustomExerciseScreen> {
                       const SizedBox(height: 24),
                       
                       // زر الحفظ
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: _saveCustomExercise,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: TColor.primary,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            elevation: 3,
-                          ),
-                          child: const Text(
-                            'حفظ التمرين المخصص',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ),
+                      RoundButton(
+                        onPressed: _saveCustomExercise,
+                        title: 'حفظ التمرين المخصص',
                       ),
                     ],
                   ),
@@ -454,6 +446,44 @@ class _CustomExerciseScreenState extends State<CustomExerciseScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: TColor.primary),
+        ),
+        filled: true,
+        fillColor: Colors.white,
+      ),
+      maxLines: maxLines,
+      keyboardType: keyboardType,
+      validator: validator,
+    );
+  }
+  
+  /// نسخة مضغوطة من حقل النص مع تصميم أبسط وحجم أصغر للنص
+  Widget _buildCompactTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    int maxLines = 1,
+    TextInputType keyboardType = TextInputType.text,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      style: const TextStyle(fontSize: 14), // حجم خط أصغر
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(fontSize: 13), // حجم خط أصغر للعنوان
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // تباعد داخلي أقل
+        prefixIcon: Icon(icon, color: TColor.primary, size: 18), // أيقونة أصغر
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8), // زوايا أقل انحناء
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(color: TColor.primary),
         ),
         filled: true,
