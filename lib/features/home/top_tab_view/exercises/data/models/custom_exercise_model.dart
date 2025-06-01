@@ -28,6 +28,7 @@ class CustomExercise extends Equatable {
   final String notes; // ملاحظات شخصية
   final bool isCustom; // هل هذا تمرين مخصص
   final String localImagePath; // مسار الصورة المحلية إذا تم تغييرها
+  final bool isCompleted; // هل تم إكمال التمرين
 
   CustomExercise({
     required this.id,
@@ -51,6 +52,7 @@ class CustomExercise extends Equatable {
     this.notes = '',
     this.isCustom = true,
     this.localImagePath = '',
+    this.isCompleted = false,
   });
 
   /// إنشاء تمرين مخصص من تمرين أساسي
@@ -61,6 +63,7 @@ class CustomExercise extends Equatable {
     int lastSets = 0,
     String notes = '',
     String localImagePath = '',
+    bool isCompleted = false,
   }) {
     return CustomExercise(
       id: id ?? DateTime.now().millisecondsSinceEpoch.toString(),
@@ -83,6 +86,7 @@ class CustomExercise extends Equatable {
       lastSets: lastSets,
       notes: notes,
       localImagePath: localImagePath,
+      isCompleted: isCompleted,
     );
   }
 
@@ -91,18 +95,20 @@ class CustomExercise extends Equatable {
     required int categoryId,
     required String title,
     required String description,
+    required String mainImageUrl,
+    required List<String> imageUrl,
     required int level,
-    String mainImageUrl = '',
-    List<String> imageUrl = const [],
     double lastWeight = 0,
     int lastReps = 0,
     int lastSets = 0,
     String notes = '',
     String localImagePath = '',
+    bool isCompleted = false,
   }) {
+    final now = DateTime.now();
     return CustomExercise(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      originalExerciseId: -1, // -1 يشير إلى أنه تمرين جديد تماماً
+      id: now.millisecondsSinceEpoch.toString(),
+      originalExerciseId: 0, // تمرين جديد ليس له أصل
       categoryId: categoryId,
       title: title,
       description: description,
@@ -110,17 +116,18 @@ class CustomExercise extends Equatable {
       imageUrl: imageUrl,
       level: level,
       isFavorite: false,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-      originalTitle: title, // نفس العنوان لأنه تمرين جديد
-      originalDescription: description, // نفس الوصف لأنه تمرين جديد
-      originalImageUrl: mainImageUrl, // نفس الصورة لأنه تمرين جديد
-      originalGalleryImages: imageUrl, // نفس الصور الإضافية لأنه تمرين جديد
+      createdAt: now,
+      updatedAt: now,
+      originalTitle: title,
+      originalDescription: description,
+      originalImageUrl: mainImageUrl,
+      originalGalleryImages: imageUrl,
       lastWeight: lastWeight,
       lastReps: lastReps,
       lastSets: lastSets,
       notes: notes,
       localImagePath: localImagePath,
+      isCompleted: isCompleted,
     );
   }
 
@@ -148,6 +155,7 @@ class CustomExercise extends Equatable {
       'notes': notes,
       'isCustom': isCustom,
       'localImagePath': localImagePath,
+      'isCompleted': isCompleted,
     };
   }
 
@@ -175,6 +183,7 @@ class CustomExercise extends Equatable {
       notes: json['notes'],
       isCustom: json['isCustom'],
       localImagePath: json['localImagePath'],
+      isCompleted: json['isCompleted'] ?? false,
     );
   }
 
@@ -201,6 +210,7 @@ class CustomExercise extends Equatable {
     String? notes,
     bool? isCustom,
     String? localImagePath,
+    bool? isCompleted,
   }) {
     return CustomExercise(
       id: id ?? this.id,
@@ -224,6 +234,7 @@ class CustomExercise extends Equatable {
       notes: notes ?? this.notes,
       isCustom: isCustom ?? this.isCustom,
       localImagePath: localImagePath ?? this.localImagePath,
+      isCompleted: isCompleted ?? this.isCompleted,
     );
   }
 

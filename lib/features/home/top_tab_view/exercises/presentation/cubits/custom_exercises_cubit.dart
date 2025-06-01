@@ -159,6 +159,67 @@ class CustomExercisesCubit extends Cubit<CustomExercisesState> {
       emit(CustomExercisesError(message: e.toString()));
     }
   }
+  
+  /// تبديل حالة إكمال التمرين
+  Future<void> toggleExerciseCompletion(String exerciseId) async {
+    emit(CustomExercisesLoading());
+    
+    try {
+      // جلب التمرين الحالي
+      final exercise = await _localDataSource.getCustomExerciseById(exerciseId);
+      
+      if (exercise != null) {
+        // تبديل حالة الإكمال
+        final updatedExercise = exercise.copyWith(
+          isCompleted: !exercise.isCompleted,
+          updatedAt: DateTime.now(),
+        );
+        
+        // حفظ التمرين المحدث
+        await _localDataSource.saveCustomExercise(updatedExercise);
+        
+        // إعادة تحميل التمارين
+        if (_selectedCategory != null) {
+          await loadExercises(_selectedCategory!, _selectedLevel);
+        }
+      } else {
+        emit(const CustomExercisesError(message: 'لم يتم العثور على التمرين'));
+      }
+    } catch (e) {
+      emit(CustomExercisesError(message: e.toString()));
+    }
+  }
+  
+  /// إعادة تعيين حالة إكمال جميع التمارين
+  Future<void> resetAllCompletionStatus() async {
+    emit(CustomExercisesLoading());
+    
+    try {
+      if (_selectedCategory != null) {
+        // جلب جميع التمارين المخصصة للفئة والمستوى الحالي
+        final exercises = await _localDataSource.getCustomExercisesByCategoryAndLevel(
+          _selectedCategory!.id, 
+          _selectedLevel
+        );
+        
+        // تحديث جميع التمارين لتكون غير مكتملة
+        for (final exercise in exercises) {
+          if (exercise.isCompleted) {
+            final updatedExercise = exercise.copyWith(
+              isCompleted: false,
+              updatedAt: DateTime.now(),
+            );
+            await _localDataSource.saveCustomExercise(updatedExercise);
+          }
+        }
+        
+        // إعادة تحميل التمارين
+        await loadExercises(_selectedCategory!, _selectedLevel);
+      }
+    } catch (e) {
+      emit(CustomExercisesError(message: e.toString()));
+    }
+  }
 
   /// تحديث الوزن الأخير للتمرين
   Future<void> updateLastWeight(String id, double weight, int reps, int sets) async {

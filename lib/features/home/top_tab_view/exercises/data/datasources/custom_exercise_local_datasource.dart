@@ -4,7 +4,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:healtho_gym/features/home/top_tab_view/exercises/data/models/custom_exercise_model.dart';
-import 'package:healtho_gym/features/home/top_tab_view/exercises/data/models/exercise_model.dart';
 
 /// مصدر بيانات محلي للتمارين المخصصة
 class CustomExerciseLocalDataSource {

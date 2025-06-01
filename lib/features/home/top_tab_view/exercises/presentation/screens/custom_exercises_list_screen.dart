@@ -45,6 +45,36 @@ class _CustomExercisesListScreenState extends State<CustomExercisesListScreen>
         .read<CustomExercisesCubit>()
         .loadExercises(widget.category, widget.level);
   }
+  
+  /// إعادة تعيين حالة إكمال جميع التمارين
+  void _resetCompletionStatus() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('إعادة تعيين حالة الإكمال'),
+        content: const Text('هل أنت متأكد من رغبتك في إعادة تعيين حالة إكمال جميع التمارين؟'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إلغاء'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.read<CustomExercisesCubit>().resetAllCompletionStatus();
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('إعادة تعيين'),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  /// تبديل حالة إكمال التمرين
+  void _toggleExerciseCompletion(CustomExercise exercise) {
+    context.read<CustomExercisesCubit>().toggleExerciseCompletion(exercise.id);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +91,13 @@ class _CustomExercisesListScreenState extends State<CustomExercisesListScreen>
         backgroundColor: AppColors.secondary,
         titleColor: AppColors.white,
         actions: [
+          // زر إعادة تعيين حالة الإكمال
+          IconButton(
+            icon: const Icon(Icons.restart_alt, color: AppColors.white),
+            tooltip: 'إعادة تعيين حالة الإكمال',
+            onPressed: _resetCompletionStatus,
+          ),
+          // زر تحديث القائمة
           IconButton(
             icon: const Icon(Icons.refresh, color: AppColors.white),
             onPressed: _loadExercises,
@@ -211,6 +248,8 @@ class _CustomExercisesListScreenState extends State<CustomExercisesListScreen>
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
+      // إضافة خلفية خضراء فاتحة للتمارين المكتملة
+      color: exercise.isCompleted ? Colors.green[50] : null,
       child: InkWell(
         onTap: () => _navigateToCustomExerciseDetails(exercise),
         borderRadius: BorderRadius.circular(12),
@@ -263,6 +302,30 @@ class _CustomExercisesListScreenState extends State<CustomExercisesListScreen>
                       ),
                       Row(
                         children: [
+                          // زر تبديل حالة إكمال التمرين
+                          InkWell(
+                            onTap: () => _toggleExerciseCompletion(exercise),
+                            borderRadius: BorderRadius.circular(20),
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: exercise.isCompleted
+                                    ? Colors.green.withOpacity(0.2)
+                                    : Colors.grey.withOpacity(0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                exercise.isCompleted
+                                    ? Icons.check_circle
+                                    : Icons.check_circle_outline,
+                                size: 20,
+                                color: exercise.isCompleted
+                                    ? Colors.green
+                                    : Colors.grey,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
                           // زر حذف التمرين
                           InkWell(
                             onTap: () => _showDeleteConfirmation(exercise),
